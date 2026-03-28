@@ -42,8 +42,7 @@ app.use('/api/team', require('./routes/teamRoutes'));
 app.use('/api/campaigns', require('./routes/campaignRoutes'));
 app.use('/api/page-content', require('./routes/pageContentRoutes')); 
 
-// 🔥 YAHAN HUMNE NAYA UPLOAD ROUTE ADD KIYA HAI 🔥
-app.use('/api/upload', require('./routes/uploadRoutes')); 
+
 
 // 7. 404 Route Handler (Agar koi aisi API hit kare jo exist nahi karti)
 app.use((req, res, next) => {
