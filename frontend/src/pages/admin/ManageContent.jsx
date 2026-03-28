@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './ManageContent.css';
-
+import config from "../../config";
 const ManageContent = () => {
     // State matching full schema
     const [content, setContent] = useState({
@@ -20,7 +20,7 @@ const ManageContent = () => {
     useEffect(() => {
         const fetchContent = async () => {
             try {
-                const res = await axios.get('http://localhost:5000/api/page-content');
+                const res = await axios.get(`${config.API_BASE_URL}/page-content`);
                 if (res.data.data && Object.keys(res.data.data).length > 0) {
                     setContent(prev => ({
                         ...prev,
@@ -82,7 +82,7 @@ const ManageContent = () => {
         formData.append('image', file); 
 
         try {
-            const uploadRes = await axios.post('http://localhost:5000/api/upload', formData, {
+            const uploadRes = await axios.post(`${config.API_BASE_URL}/upload`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             
@@ -122,7 +122,7 @@ const ManageContent = () => {
         setMessage('');
         
         try {
-            await axios.post('http://localhost:5000/api/page-content', content);
+            await axios.post(`${config.API_BASE_URL}/page-content`, content);
             setMessage('Website Content Updated Successfully! 🔥 Refresh your main site to see changes.');
             window.scrollTo({ top: 0, behavior: 'smooth' });
             setTimeout(() => setMessage(''), 5000); 

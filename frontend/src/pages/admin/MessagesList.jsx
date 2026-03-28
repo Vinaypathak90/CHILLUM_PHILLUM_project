@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './MessagesList.css';
+import config from "../../config"; // Centralized config for API base URL
 
 const MessagesList = () => {
     const [messages, setMessages] = useState([]);
@@ -10,7 +11,7 @@ const MessagesList = () => {
 
     const fetchMessages = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/messages');
+            const res = await axios.get(`${config.API_BASE_URL}/messages`);
             setMessages(res.data.data);
             setLoading(false);
         } catch (err) {
@@ -31,7 +32,7 @@ const MessagesList = () => {
         if (msg.status === 'Unread') {
             try {
                 // Note: Make sure you have a PUT /api/messages/:id route in backend to update status
-                await axios.put(`http://localhost:5000/api/messages/${msg._id}`, { status: 'Read' });
+                await axios.put(`${config.API_BASE_URL}/messages/${msg._id}`, { status: 'Read' });
                 // Locally state update kardo taaki refresh na karna pade
                 setMessages(messages.map(m => m._id === msg._id ? { ...m, status: 'Read' } : m));
             } catch (err) {
@@ -45,7 +46,7 @@ const MessagesList = () => {
         if (window.confirm('Permanently delete this inquiry?')) {
             try {
                 // Note: Make sure you have a DELETE /api/messages/:id route in backend
-                await axios.delete(`http://localhost:5000/api/messages/${id}`);
+                await axios.delete(`${config.API_BASE_URL}/messages/${id}`);
                 setAlertMsg('Message deleted successfully.');
                 fetchMessages();
                 setTimeout(() => setAlertMsg(''), 3000);

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import config from "../../config";
  // Make sure your CSS has the modal-overlay styles
 
 // ─── REUSABLE SUB-COMPONENTS ───
@@ -66,10 +67,10 @@ const Home = () => {
     const fetchData = async () => {
       try {
         const [contentRes, projectRes, teamRes, campaignRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/page-content'),
-          axios.get('http://localhost:5000/api/projects'),
-          axios.get('http://localhost:5000/api/team'),
-          axios.get('http://localhost:5000/api/campaigns')
+          axios.get(`${config.API_BASE_URL}/page-content`),
+          axios.get(`${config.API_BASE_URL}/projects`),
+          axios.get(`${config.API_BASE_URL}/team`),
+          axios.get(`${config.API_BASE_URL}/campaigns`)
         ]);
 
         setData({
@@ -188,7 +189,7 @@ const Home = () => {
     e.preventDefault();
     setFormStatus('Sending...');
     try {
-      await axios.post('http://localhost:5000/api/messages', formData);
+      await axios.post(`${config.API_BASE_URL}/messages`, formData);
       setFormStatus('Sent!');
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
       setTimeout(() => setFormStatus('Send Message'), 3000);

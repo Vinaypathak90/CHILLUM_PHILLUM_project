@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './ManageContent.css'; // Importing shared standard admin CSS
-import './ManageCampaigns.css'; // Any specific campaign CSS
+import config from "../../config"; // Any specific campaign CSS
 
 const ManageCampaigns = () => {
     const [campaigns, setCampaigns] = useState([]);
@@ -30,7 +30,7 @@ const ManageCampaigns = () => {
     // Fetch all campaigns on mount
     const fetchCampaigns = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/campaigns');
+            const res = await axios.get(`${config.API_BASE_URL}/campaigns`);
             setCampaigns(res.data.data);
             setLoading(false);
         } catch (err) {
@@ -67,7 +67,7 @@ const ManageCampaigns = () => {
         fd.append('image', file);
 
         try {
-            const uploadRes = await axios.post('http://localhost:5000/api/upload', fd, {
+            const uploadRes = await axios.post(`${config.API_BASE_URL}/upload`, fd, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             setFormData(prev => ({ ...prev, imageUrl: uploadRes.data.imageUrl }));
@@ -90,11 +90,11 @@ const ManageCampaigns = () => {
         try {
             if (isEditing) {
                 // Update existing campaign
-                await axios.put(`http://localhost:5000/api/campaigns/${currentId}`, formData);
+                await axios.put(`${config.API_BASE_URL}/campaigns/${currentId}`, formData);
                 setMessage({ text: 'Campaign updated successfully! 📢', type: 'success' });
             } else {
                 // Create new campaign
-                await axios.post('http://localhost:5000/api/campaigns', formData);
+                await axios.post(`${config.API_BASE_URL}/campaigns`, formData);
                 setMessage({ text: 'New campaign published! 🎉', type: 'success' });
             }
             
@@ -140,7 +140,7 @@ const ManageCampaigns = () => {
     const handleDeleteClick = async (id) => {
         if (window.confirm('Are you sure you want to permanently delete this campaign?')) {
             try {
-                await axios.delete(`http://localhost:5000/api/campaigns/${id}`);
+                await axios.delete(`${config.API_BASE_URL}/campaigns/${id}`);
                 setMessage({ text: 'Campaign deleted.', type: 'success' });
                 fetchCampaigns();
                 setTimeout(() => setMessage({ text: '', type: '' }), 3000);

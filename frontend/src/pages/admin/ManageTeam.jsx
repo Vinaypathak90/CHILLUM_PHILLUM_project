@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './ManageContent.css'; // Standard admin CSS
 import './ManageProjects.css'; 
+import config from "../../config";// Centralized config for API base URL
 
 const ManageTeam = () => {
     const [team, setTeam] = useState([]);
@@ -27,7 +28,7 @@ const ManageTeam = () => {
     // Fetch all team members on mount
     const fetchTeam = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/team');
+            const res = await axios.get(`${config.API_BASE_URL}/team`);
             setTeam(res.data.data);
             setLoading(false);
         } catch (err) {
@@ -55,7 +56,8 @@ const ManageTeam = () => {
         fd.append('image', file);
 
         try {
-            const uploadRes = await axios.post('http://localhost:5000/api/upload', fd, {
+            const uploadRes = await axios.post(`${config.API_BASE_URL}/upload`
+                , fd, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             setFormData(prev => ({ ...prev, photoUrl: uploadRes.data.imageUrl }));
@@ -78,11 +80,11 @@ const ManageTeam = () => {
         try {
             if (isEditing) {
                 // Update existing member
-                await axios.put(`http://localhost:5000/api/team/${currentId}`, formData);
+                await axios.put(`${config.API_BASE_URL}/team/${currentId}`, formData);
                 setMessage({ text: 'Team member updated successfully! 👥', type: 'success' });
             } else {
                 // Create new member
-                await axios.post('http://localhost:5000/api/team', formData);
+                await axios.post(`${config.API_BASE_URL}/team`, formData);
                 setMessage({ text: 'New team member added! 🎉', type: 'success' });
             }
             
@@ -125,7 +127,7 @@ const ManageTeam = () => {
     const handleDeleteClick = async (id) => {
         if (window.confirm('Are you sure you want to remove this team member?')) {
             try {
-                await axios.delete(`http://localhost:5000/api/team/${id}`);
+                await axios.delete(`${config.API_BASE_URL}/team/${id}`);
                 setMessage({ text: 'Team member removed.', type: 'success' });
                 fetchTeam();
                 setTimeout(() => setMessage({ text: '', type: '' }), 3000);

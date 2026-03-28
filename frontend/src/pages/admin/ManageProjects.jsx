@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './ManageContent.css'; // Consistent admin styles
 import './ManageProjects.css'; 
-
+import config from "../../config";// Centralized config for API base URL
 const ManageProjects = () => {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -28,7 +28,7 @@ const ManageProjects = () => {
     // Fetch all projects on mount
     const fetchProjects = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/projects');
+            const res = await axios.get(`${config.API_BASE_URL}/projects`);
             setProjects(res.data.data);
             setLoading(false);
         } catch (err) {
@@ -56,7 +56,7 @@ const ManageProjects = () => {
         fd.append('image', file);
 
         try {
-            const uploadRes = await axios.post('http://localhost:5000/api/upload', fd, {
+            const uploadRes = await axios.post(`${config.API_BASE_URL}/upload`, fd, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             setFormData(prev => ({ ...prev, imageUrl: uploadRes.data.imageUrl }));
@@ -79,11 +79,11 @@ const ManageProjects = () => {
         try {
             if (isEditing) {
                 // Update existing project
-                await axios.put(`http://localhost:5000/api/projects/${currentId}`, formData);
+                await axios.put(`${config.API_BASE_URL}/projects/${currentId}`, formData);
                 setMessage({ text: 'Project successfully updated! 🎬', type: 'success' });
             } else {
                 // Create new project
-                await axios.post('http://localhost:5000/api/projects', formData);
+                await axios.post(`${config.API_BASE_URL}/projects`, formData);
                 setMessage({ text: 'New project published! 🚀', type: 'success' });
             }
             
@@ -129,7 +129,7 @@ const ManageProjects = () => {
     const handleDeleteClick = async (id) => {
         if (window.confirm('Are you sure you want to permanently delete this project?')) {
             try {
-                await axios.delete(`http://localhost:5000/api/projects/${id}`);
+                await axios.delete(`${config.API_BASE_URL}/projects/${id}`);
                 setMessage({ text: 'Project deleted.', type: 'success' });
                 fetchProjects();
                 setTimeout(() => setMessage({ text: '', type: '' }), 3000);

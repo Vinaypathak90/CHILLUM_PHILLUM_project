@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import './Dashboard.css';
+import config from "../../config";
 
 const Dashboard = () => {
     const [stats, setStats] = useState({ messages: 0, unread: 0, projects: 0, campaigns: 0, team: 0 });
@@ -13,10 +14,10 @@ const Dashboard = () => {
         const fetchDashboardData = async () => {
             try {
                 const [msgRes, projRes, campRes, teamRes] = await Promise.all([
-                    axios.get('http://localhost:5000/api/messages'),
-                    axios.get('http://localhost:5000/api/projects'),
-                    axios.get('http://localhost:5000/api/campaigns'),
-                    axios.get('http://localhost:5000/api/team')
+                    axios.get(`${config.API_BASE_URL}/messages`),
+                    axios.get(`${config.API_BASE_URL}/projects`),
+                    axios.get(`${config.API_BASE_URL}/campaigns`),
+                    axios.get(`${config.API_BASE_URL}/team`)
                 ]);
 
                 const unreadCount = msgRes.data.data.filter(m => m.status === 'Unread').length;
