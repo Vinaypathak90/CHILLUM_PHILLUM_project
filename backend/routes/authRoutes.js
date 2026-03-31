@@ -1,9 +1,22 @@
 const express = require('express');
 const router = express.Router();
-const { loginAdmin } = require('../controllers/authController');
 
-// Route: POST /api/auth/login
-// Public route (kyunki login karne ke liye pehle se token nahi ho sakta)
+// Controller se teeno functions import kar rahe hain
+const { loginAdmin, refreshAdmin, logoutAdmin } = require('../controllers/authController');
+
+// @route   POST /api/auth/login
+// @desc    Admin login & get tokens (Access + Refresh)
+// @access  Public
 router.post('/login', loginAdmin);
+
+// @route   POST /api/auth/refresh
+// @desc    Get new Access Token using HttpOnly Cookie
+// @access  Public (Frontend chupke se isko call karega background mein)
+router.post('/refresh', refreshAdmin);
+
+// @route   POST /api/auth/logout
+// @desc    Logout admin & clear HttpOnly cookie
+// @access  Public
+router.post('/logout', logoutAdmin);
 
 module.exports = router;

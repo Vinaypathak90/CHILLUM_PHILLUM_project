@@ -1,12 +1,11 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const connectDB = require('./config/db');
 
 // 1. Load Environment Variables (Sabse pehle load karna zaroori hai)
 dotenv.config();
-
-// Ab config load hone ke baad DB import karenge
-const connectDB = require('./config/db');
 
 // 2. Connect to MongoDB
 connectDB();
@@ -15,15 +14,20 @@ connectDB();
 const app = express();
 
 // 4. Global Middlewares
-// CORS setup: Frontend aur Backend alag ports par hote hain, isliye ye zaroori hai
+// 🔥 CORS Setup (FIXED FOR COOKIES): 
+// origin '*' credentials ke sath kaam nahi karta. Exact URLs dene hote hain.
 app.use(cors({
-    origin: '*', // Jab website live hogi, toh '*' ki jagah hum exact frontend URL daalenge security ke liye
-    credentials: true
+    origin: [
+        'http://localhost:5173', // Local development ke liye
+        'https://chillum-phillum-project.vercel.app' // Live Vercel frontend ke liye
+    ],
+    credentials: true // Cookie (Refresh Token) bhejne/receive karne ke liye ZAROORI hai
 }));
 
-// Body parsers: Jo data frontend se aayega (text, json) usko read karne ke liye
+// Body & Cookie Parsers
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser()); // Req.cookies ko padhne ke liye middleware
 
 // 5. Default Route (API Check)
 app.get('/', (req, res) => {
@@ -35,16 +39,14 @@ app.get('/', (req, res) => {
 });
 
 // 6. 🚀 Main API Routes 
-app.use('/api/auth', require('./routes/authRoutes')); // 🔐 Admin Login aur Auth ke liye
-app.use('/api/messages', require('./routes/messageRoutes'));
-app.use('/api/projects', require('./routes/projectRoutes'));
-app.use('/api/team', require('./routes/teamRoutes'));
-app.use('/api/campaigns', require('./routes/campaignRoutes'));
-app.use('/api/page-content', require('./routes/pageContentRoutes')); 
+app.use('/api/auth', require('./routes/authRoutes'));           // Admin Login, Refresh, Logout
+app.use('/api/messages', require('./routes/messageRoutes'));    // Contact Form Messages
+app.use('/api/projects', require('./routes/projectRoutes'));    // Projects/Portfolio
+app.use('/api/team', require('./routes/teamRoutes'));          // Team Members
+app.use('/api/campaigns', require('./routes/campaignRoutes'));  // Campaigns/News
+app.use('/api/page-content', require('./routes/pageContentRoutes')); // Dynamic Homepage Content
 
-
-
-// 7. 404 Route Handler (Agar koi aisi API hit kare jo exist nahi karti)
+// 7. 404 Route Handler (Agar koi galat API URL hit kare)
 app.use((req, res, next) => {
     res.status(404).json({
         success: false,
@@ -70,5 +72,5 @@ const PORT = process.env.PORT || 5000;
 const ENV = process.env.NODE_ENV || 'development';
 
 app.listen(PORT, () => {
-    console.log(`🔥 Server is running in ${ENV} mode on http://localhost:${PORT}`);
+    console.log(`🔥 Server is running in ${ENV} mode on port ${PORT}`);
 });
