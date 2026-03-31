@@ -4,25 +4,34 @@ import config from "../../config";
  // Make sure your CSS has the modal-overlay styles
 
 // ─── REUSABLE SUB-COMPONENTS ───
+const Navbar = ({ navData }) => {
+  const [imgFailed, setImgFailed] = React.useState(false);
+  return (
+    <nav>
+      <div className="nav-top">
+        <a href="#home" className="nav-logo">
+          {!imgFailed && (
+            <img
+              src={navData?.logoImage || "img/logo.png"}
+              alt="Chillum Phillum"
+              onError={() => setImgFailed(true)}
+            />
+          )}
+          {imgFailed && <span>{navData?.logoText || "CHILLUM PHILLUM"}</span>}
+        </a>
+        <ul className="nav-links">
+          <li><a href="#about">About</a></li>
+          <li><a href="#studio">The Studio</a></li>
+          <li><a href="#team">Our Team</a></li>
+          <li><a href="#projects">Our Projects</a></li>
+          <li><a href="#news">Our Campaigns</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+    </nav>
+  );
+};
 
-const Navbar = ({ navData }) => (
-  <nav>
-    <div className="nav-top">
-      <a href="#home" className="nav-logo">
-        <img src={navData?.logoImage || "img/logo.png"} alt="Chillum Phillum" onError={(e) => e.target.style.display='none'}/>
-        <span>{navData?.logoText || "CHILLUM PHILLUM"}</span>
-      </a>
-      <ul className="nav-links">
-        <li><a href="#about">About</a></li>
-        <li><a href="#studio">The Studio</a></li>
-        <li><a href="#team">Our Team</a></li>
-        <li><a href="#projects">Our Projects</a></li>
-        <li><a href="#news">Our Campaigns</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-    </div>
-  </nav>
-);
 
 const SectionHeader = ({ label, titleMain, titleHighlight, titleEnd, align = 'left' }) => (
   <div style={{ textAlign: align, display: 'flex', flexDirection: 'column', alignItems: align === 'center' ? 'center' : 'flex-start' }}>

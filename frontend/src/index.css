@@ -1144,7 +1144,7 @@
         gap: 1.5rem;
       }
       .projects-header > a, .news-header > a {
-        align-self: stretch;
+        /* align-self: stretch; */
         text-align: center;
       }
 
@@ -1223,4 +1223,3 @@
   .modal-text-col { padding: 2rem; }
   .modal-title { font-size: 2rem; }
 }
-
