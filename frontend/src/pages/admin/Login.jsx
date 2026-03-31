@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './Login.css'; // <-- CSS FILE IMPORT KI HAI YAHAN
 import config from "../../config";
+
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -17,16 +18,26 @@ const Login = () => {
         setLoading(true);
 
         try {
+            // 🔥 NAYA: 'withCredentials: true' lagaya taaki browser backend se aane wali cookie (Refresh Token) accept kar le
             const response = await axios.post(`${config.API_BASE_URL}/auth/login`, {
                 email,
                 password
+            }, {
+                withCredentials: true 
             });
 
             if (response.data.success) {
-                localStorage.setItem('token', response.data.token);
+                // 🔥 NAYA: Sirf 'accessToken' localStorage me save hoga (15 min wala)
+                // Refresh token toh automatically secure HttpOnly cookie me chala gaya hai!
+                localStorage.setItem('accessToken', response.data.accessToken);
+                
+                // Optional: User ka data bhi save kar sakte ho agar dashboard pe naam dikhana hai
+                // localStorage.setItem('user', JSON.stringify({ email: response.data.email, id: response.data._id }));
+
                 navigate('/dashboard');
             }
         } catch (err) {
+            console.error("Login Error:", err);
             setError(err.response?.data?.message || 'Login Failed. Check your credentials.');
         } finally {
             setLoading(false);
@@ -109,6 +120,8 @@ const Login = () => {
                                 placeholder="Enter Password"
                                 required
                             />
+                            
+                            {/* EYE ICON TOGGLE */}
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
@@ -149,6 +162,6 @@ const Login = () => {
             </div>
         </div>
     );
-};
+}; 
 
 export default Login;
