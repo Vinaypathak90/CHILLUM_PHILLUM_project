@@ -99,6 +99,10 @@ const Home = () => {
   const [activeStudio, setActiveStudio] = useState(null);
   const [activeCampaign, setActiveCampaign] = useState(null);
 
+  // 🔥 SLIDER KE LIYE NAYE STATES
+  const [clients, setClients] = useState([]);
+  const [loadingClients, setLoadingClients] = useState(true);
+
   // Lock background scroll when any modal is open
   useEffect(() => {
     if (activeImage || activeProject || activeTeam || activeStudio || activeCampaign) {
@@ -132,6 +136,24 @@ const Home = () => {
       }
     };
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    // Backend se clients lane ka function
+    const fetchClients = async () => {
+        try {
+            const res = await axios.get(`${config.API_BASE_URL}/clients`); // Public route hit karega
+            if (res.data.success) {
+                setClients(res.data.data);
+            }
+            setLoadingClients(false);
+        } catch (error) {
+            console.error("Error fetching clients:", error);
+            setLoadingClients(false);
+        }
+    };
+
+    fetchClients();
   }, []);
 
   // 2. Animations & DOM Manipulation
@@ -382,6 +404,33 @@ const Home = () => {
           ))}
         </div>
       </section>
+      {/* ── CLIENT SLIDER SECTION ── */}
+            {!loadingClients && clients.length > 0 && (
+                <div className="client-slider-wrapper">
+                    <div className="client-slider-header">
+                        <h3>Our Trusted Partners</h3>
+                        <p>Companies we have collaborated with</p>
+                    </div>
+                    
+                    <div className="slider-container">
+                        <div className="slider-track">
+                            {/* Set 1 (Original) */}
+                            {clients.map((client) => (
+                                <div className="slide" key={client._id}>
+                                    <img src={client.logoUrl} alt={client.name} loading="lazy" />
+                                </div>
+                            ))}
+                            
+                            {/* Set 2 (Duplicate - Seamless infinite loop ke liye Zaroori) */}
+                            {clients.map((client) => (
+                                <div className="slide" key={`dup-${client._id}`}>
+                                    <img src={client.logoUrl} alt={client.name} loading="lazy" />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
 
       {/* ── NEWS / CAMPAIGNS SECTION ── */}
       <section id="news">

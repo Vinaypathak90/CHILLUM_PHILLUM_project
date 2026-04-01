@@ -45,7 +45,7 @@ app.use('/api/projects', require('./routes/projectRoutes'));    // Projects/Port
 app.use('/api/team', require('./routes/teamRoutes'));          // Team Members
 app.use('/api/campaigns', require('./routes/campaignRoutes'));  // Campaigns/News
 app.use('/api/page-content', require('./routes/pageContentRoutes')); // Dynamic Homepage Content
-
+app.use('/api/clients', require('./routes/clientRoutes'));
 // 7. 404 Route Handler (Agar koi galat API URL hit kare)
 app.use((req, res, next) => {
     res.status(404).json({

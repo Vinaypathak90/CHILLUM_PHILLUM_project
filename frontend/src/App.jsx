@@ -11,10 +11,10 @@ import ManageProjects from './pages/admin/ManageProjects';
 import ManageContent from './pages/admin/ManageContent';
 import ManageCampaigns from './pages/admin/ManageCampaigns'; // 🔥 Naya Import
 import ManageTeam from './pages/admin/ManageTeam';           // 🔥 Naya Import
-
+import ManageClients from './pages/admin/ManageClients';
 // 🛡️ Protected Route Logic
 const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('accessToken');
   // Agar token nahi hai, toh wapas login page par bhej do
   if (!token) {
     return <Navigate to="/login" replace />;
@@ -49,10 +49,12 @@ function App() {
           {/* 🔥 YAHAN HUMNE NAYE ROUTES ADD KIYE HAIN */}
           <Route path="campaigns" element={<ManageCampaigns />} />
           <Route path="team" element={<ManageTeam />} />
+          <Route path="clients" element={<ManageClients />} />
         </Route>
         
         {/* 404 Redirect - Agar link exist nahi karti toh Home par bhejo */}
         <Route path="*" element={<Navigate to="/" replace />} />
+        
       </Routes>
     </Router>
   );
