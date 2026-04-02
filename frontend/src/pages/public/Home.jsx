@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import config from "../../config";
- // Make sure your CSS has the modal-overlay styles
+// Make sure your CSS has the modal-overlay styles and client slider styles
 
 // ─── REUSABLE SUB-COMPONENTS ───
 const Navbar = ({ navData }) => {
@@ -69,7 +69,6 @@ const Navbar = ({ navData }) => {
   );
 };
 
-
 const SectionHeader = ({ label, titleMain, titleHighlight, titleEnd, align = 'left' }) => (
   <div style={{ textAlign: align, display: 'flex', flexDirection: 'column', alignItems: align === 'center' ? 'center' : 'flex-start' }}>
     <span className="section-label">{label}</span>
@@ -82,6 +81,7 @@ const SectionHeader = ({ label, titleMain, titleHighlight, titleEnd, align = 'le
 // ─── MAIN HOME COMPONENT ───
 
 const Home = () => {
+  // 1. ALL STATES AT THE TOP (React Rules of Hooks)
   const [data, setData] = useState({
     pageContent: null,
     projects: [],
@@ -99,10 +99,12 @@ const Home = () => {
   const [activeStudio, setActiveStudio] = useState(null);
   const [activeCampaign, setActiveCampaign] = useState(null);
 
-  // 🔥 SLIDER KE LIYE NAYE STATES
+  // 🔥 SLIDER STATES (Moved to top level)
   const [clients, setClients] = useState([]);
   const [loadingClients, setLoadingClients] = useState(true);
 
+  // 2. ALL EFFECTS
+  
   // Lock background scroll when any modal is open
   useEffect(() => {
     if (activeImage || activeProject || activeTeam || activeStudio || activeCampaign) {
@@ -112,7 +114,7 @@ const Home = () => {
     }
   }, [activeImage, activeProject, activeTeam, activeStudio, activeCampaign]);
 
-  // 1. Fetch Data from Backend
+  // Fetch Main Data from Backend
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -138,11 +140,11 @@ const Home = () => {
     fetchData();
   }, []);
 
+  // Fetch Clients for Slider
   useEffect(() => {
-    // Backend se clients lane ka function
     const fetchClients = async () => {
         try {
-            const res = await axios.get(`${config.API_BASE_URL}/clients`); // Public route hit karega
+            const res = await axios.get(`${config.API_BASE_URL}/clients`);
             if (res.data.success) {
                 setClients(res.data.data);
             }
@@ -152,11 +154,10 @@ const Home = () => {
             setLoadingClients(false);
         }
     };
-
     fetchClients();
   }, []);
 
-  // 2. Animations & DOM Manipulation
+  // Animations & DOM Manipulation
   useEffect(() => {
     if (loading) return;
 
@@ -234,6 +235,7 @@ const Home = () => {
     };
   }, [loading]);
 
+  // 3. HELPER FUNCTIONS
   const handleSpotlight = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
@@ -267,7 +269,6 @@ const Home = () => {
     }
   };
 
-  // Close all modals helper
   const closeAllModals = () => {
     setActiveImage(null);
     setActiveProject(null);
@@ -276,8 +277,10 @@ const Home = () => {
     setActiveCampaign(null);
   };
 
+  // 4. EARLY RETURN (Must be after all hooks!)
   if (loading) return <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', background: '#f7f4ef', color: '#1a1a1a', fontWeight: 'bold', fontFamily: 'var(--font-display)' }}>🎬 Loading Chillum Phillum...</div>;
 
+  // 5. VARIABLES FOR RENDER
   const content = data.pageContent || {};
   const heroImages = (content.hero?.backgroundImages || []).filter(img => img.trim() !== '');
   const fallbackHero = ["https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=1200&q=80", "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1200&q=80"];
@@ -286,6 +289,7 @@ const Home = () => {
   const aboutParagraphs = content.about?.paragraphs?.length > 0 ? content.about.paragraphs : ["We combine cinematic vision with advertising craft and photography excellence..."];
   const displayStats = content.about?.stats?.length > 0 ? content.about.stats : [{ number: "50+", label: "PROJECTS" }, { number: "5+", label: "YEARS" }, { number: "30+", label: "CLIENTS" }];
 
+  // 6. MAIN RENDER
   return (
     <>
       <Navbar navData={content.nav} />
@@ -404,34 +408,46 @@ const Home = () => {
           ))}
         </div>
       </section>
-      {/* ── CLIENT SLIDER SECTION ── */}
-            {!loadingClients && clients.length > 0 && (
-                <div className="client-slider-wrapper">
-                    <div className="client-slider-header">
-                        <h3>Our Trusted Partners</h3>
-                        <p>Companies we have collaborated with</p>
-                    </div>
-                    
-                    <div className="slider-container">
-                        <div className="slider-track">
-                            {/* Set 1 (Original) */}
-                            {clients.map((client) => (
-                                <div className="slide" key={client._id}>
-                                    <img src={client.logoUrl} alt={client.name} loading="lazy" />
-                                </div>
-                            ))}
-                            
-                            {/* Set 2 (Duplicate - Seamless infinite loop ke liye Zaroori) */}
-                            {clients.map((client) => (
-                                <div className="slide" key={`dup-${client._id}`}>
-                                    <img src={client.logoUrl} alt={client.name} loading="lazy" />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            )}
 
+{/* ── CLIENT SLIDER SECTION ── */}
+{!loadingClients && clients.length > 0 && (
+  <div className="client-slider-wrapper">
+    <div className="client-slider-header">
+      <span className="section-eyebrow">Collaborations &amp; Clientele</span>
+      <h3>Trusted by <em>Iconic</em> Brands</h3>
+      <div className="header-divider"></div>
+      <p>Companies we have collaborated with</p>
+    </div>
+
+    <div style={{ position: 'relative' }}>
+      <div className="slider-fade-left"></div>
+      <div className="slider-fade-right"></div>
+
+      <div className="slider-container">
+        <div className="slider-track">
+          {/* Set 1 */}
+          {clients.map((client) => (
+            <div className="slide" key={`a-${client._id}`}>
+              <img src={client.logoUrl} alt={client.name} loading="lazy" />
+            </div>
+          ))}
+          {/* Set 2 */}
+          {clients.map((client) => (
+            <div className="slide" key={`b-${client._id}`}>
+              <img src={client.logoUrl} alt={client.name} loading="lazy" />
+            </div>
+          ))}
+          {/* Set 3 — kam logos ho toh bhi seamless */}
+          {clients.map((client) => (
+            <div className="slide" key={`c-${client._id}`}>
+              <img src={client.logoUrl} alt={client.name} loading="lazy" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+)}
       {/* ── NEWS / CAMPAIGNS SECTION ── */}
       <section id="news">
         <div className="news-header">
@@ -509,7 +525,6 @@ const Home = () => {
             <div className="modal-text-col">
               <span className="modal-meta">{activeProject.category}</span>
               <h3 className="modal-title">{activeProject.title}</h3>
-              {/* Uses detailedDescription as priority, falls back to shortDescription */}
               <p className="modal-desc">{activeProject.detailedDescription || activeProject.shortDescription || activeProject.description}</p>
               <button className="btn-gold" style={{alignSelf: 'flex-start'}} onClick={closeAllModals}>Close Details</button>
             </div>
@@ -526,7 +541,6 @@ const Home = () => {
             <div className="modal-text-col">
               <span className="modal-meta">{activeTeam.role}</span>
               <h3 className="modal-title">{activeTeam.name}</h3>
-              {/* Uses dynamic bio */}
               <p className="modal-desc">{activeTeam.bio || "Bringing unmatched creativity and expertise to Chillum Phillum. Ensuring every frame and concept is executed flawlessly."}</p>
             </div>
           </div>
@@ -542,7 +556,6 @@ const Home = () => {
             <div className="modal-text-col">
               <span className="modal-meta">The Chillum Phillum Way</span>
               <h3 className="modal-title">{activeStudio.label}</h3>
-              {/* Uses dynamic studio description */}
               <p className="modal-desc">{activeStudio.description || `Our dedicated team combines cinematic vision with top-tier craft in ${activeStudio.label}. We work tirelessly to ensure the highest quality output.`}</p>
             </div>
           </div>
@@ -558,7 +571,6 @@ const Home = () => {
             <div className="modal-text-col">
               <span className="modal-meta">{activeCampaign.dateString}</span>
               <h3 className="modal-title" style={{fontSize: '2rem'}}>{activeCampaign.title}</h3>
-              {/* Uses detailedContent as priority, falls back to excerpt */}
               <p className="modal-desc">{activeCampaign.detailedContent || activeCampaign.excerpt}</p>
               {activeCampaign.readMoreLink && activeCampaign.readMoreLink !== '#' && (
                 <a href={activeCampaign.readMoreLink} target="_blank" rel="noreferrer" className="btn-gold" style={{alignSelf: 'flex-start'}}>Read Full Article</a>
