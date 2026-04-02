@@ -9,7 +9,11 @@ const ManageContent = () => {
         hero: { backgroundImages: [''], eyebrow: '', titleMain: '', titleHighlight: '', subtitle: '' },
         about: { label: '', titleMain: '', titleHighlight: '', titleEnd: '', paragraphs: [''], images: ['', '', ''] },
         studio: { label: '', titleMain: '', titleHighlight: '', titleEnd: '', cards: [{image: '', label: ''}, {image: '', label: ''}, {image: '', label: ''}, {image: '', label: ''}] },
-        contact: { email: '', phone: '', location: '' }
+        contact: { email: '', phone: '', location: '' },
+        footer: { 
+            copyrightText: '', 
+            socials: { instagram: '', x: '', facebook: '' } 
+        }
     });
     
     const [loading, setLoading] = useState(true);
@@ -29,7 +33,15 @@ const ManageContent = () => {
                         hero: { ...prev.hero, ...res.data.data.hero },
                         about: { ...prev.about, ...res.data.data.about },
                         studio: { ...prev.studio, ...res.data.data.studio },
-                        contact: { ...prev.contact, ...res.data.data.contact }
+                        contact: { ...prev.contact, ...res.data.data.contact },
+                        footer: {
+                            ...prev.footer,
+                            ...(res.data.data.footer || {}),
+                            socials: {
+                                ...prev.footer.socials,
+                                ...(res.data.data.footer?.socials || {})
+                            }
+                        }
                     }));
                 }
                 setLoading(false);
@@ -114,6 +126,31 @@ const ManageContent = () => {
         } else {
             handleChange(section, field, '');
         }
+    };
+    const handleSocialChange = (platform, value) => {
+        let finalValue = value.trim();
+        
+        // 🔥 AUTO-FIX: Add https:// if URL doesn't have protocol
+        if (finalValue && !finalValue.match(/^https?:\/\//)) {
+            finalValue = 'https://' + finalValue;
+        }
+        
+        setContent(prev => {
+            // 🔥 FIX: Safe data extraction taaki code crash na ho
+            const safeFooter = prev.footer || {};
+            const safeSocials = safeFooter.socials || {};
+
+            return {
+                ...prev,
+                footer: {
+                    ...safeFooter,
+                    socials: {
+                        ...safeSocials,
+                        [platform]: finalValue
+                    }
+                }
+            };
+        });
     };
 
     const handleSave = async (e) => {
@@ -389,7 +426,60 @@ const ManageContent = () => {
                         <input type="text" className="form-input" value={content.contact?.location || ''} onChange={(e) => handleChange('contact', 'location', e.target.value)} />
                     </div>
                 </div>
+{/* 🔥 NAYA: FOOTER & SOCIAL MEDIA SECTION ── */}
+                <div className="form-section" style={{ backgroundColor: '#fdfbf7', border: '1px solid #e2e8f0' }}>
+                    <div className="section-header">
+                        <div className="section-icon" style={{ backgroundColor: '#1a1a1a', color: '#fff' }}>
+                            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+                        </div>
+                        <h3>Footer & Social Media</h3>
+                    </div>
 
+                    <div className="form-group">
+                        <label className="form-label">Copyright Text</label>
+                        <input 
+                            type="text" 
+                            className="form-input" 
+                            value={content.footer?.copyrightText || ''} 
+                            onChange={(e) => handleChange('footer', 'copyrightText', e.target.value)} 
+                            placeholder="e.g. © 2026 Chillum Phillum. All rights reserved." 
+                        />
+                    </div>
+                    
+                    <label className="form-label" style={{display: 'block', marginTop: '20px', marginBottom: '10px'}}>Social Media Links</label>
+                    <div className="form-grid-2">
+                        <div className="form-group">
+                            <label className="form-label">📸 Instagram URL</label>
+                            <input 
+                                type="url" 
+                                className="form-input" 
+                                placeholder="https://instagram.com/..."
+                                value={content.footer?.socials?.instagram || ''} 
+                                onChange={(e) => handleSocialChange('instagram', e.target.value)}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">🐦 X (Twitter) URL</label>
+                            <input 
+                                type="url" 
+                                className="form-input" 
+                                placeholder="https://x.com/..."
+                                value={content.footer?.socials?.x || ''} 
+                                onChange={(e) => handleSocialChange('x', e.target.value)}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">📘 Facebook URL</label>
+                            <input 
+                                type="url" 
+                                className="form-input" 
+                                placeholder="https://facebook.com/..."
+                                value={content.footer?.socials?.facebook || ''} 
+                                onChange={(e) => handleSocialChange('facebook', e.target.value)}
+                            />
+                        </div>
+                    </div>
+                </div>
                 {/* ── SAVE BUTTON ── */}
                 <div className="form-actions">
                     <button type="submit" disabled={saving} className="save-btn">

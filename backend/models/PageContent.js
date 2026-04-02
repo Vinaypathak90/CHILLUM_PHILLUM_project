@@ -72,7 +72,12 @@ const pageContentSchema = new mongoose.Schema({
 
   // ── 6. FOOTER ──
   footer: {
-    copyrightText: { type: String, default: '© 2026 Chillum Phillum. All rights reserved.' }
+    copyrightText: { type: String, default: '© 2026 Chillum Phillum. All rights reserved.' },
+    socials: {
+            instagram: { type: String, default: '#' },
+            x: { type: String, default: '#' },
+            facebook: { type: String, default: '#' }
+        }
   }
 
 }, { 

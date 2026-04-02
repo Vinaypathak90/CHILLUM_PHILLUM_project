@@ -1157,43 +1157,122 @@
     /* ─────────────────────────────────────────
        FOOTER
     ───────────────────────────────────────── */
-    footer {
-      background: #1a1a1a;
-      border-top: 1px solid rgba(181,134,42,0.2);
-      padding: 2.5rem 3rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+   /* =========================================
+   FOOTER STYLES (Premium Gold Theme)
+========================================= */
 
-    .footer-logo {
-      font-family: var(--font-display);
-      font-size: 1.5rem;
-      letter-spacing: 0.14em;
-      color: var(--gold);
-    }
+footer {
+  background: #1a1a1a;
+  border-top: 1px solid rgba(181, 134, 42, 0.2); /* Tera gold tint border */
+  padding: 2.5rem 3rem;
+  display: flex;
+  flex-direction: column; /* Elements ko 2 rows me divide karne ke liye */
+  gap: 2rem;
+}
 
-    .footer-copy {
-      font-size: 0.72rem;
-      color: rgba(255,255,255,0.35);
-      letter-spacing: 0.1em;
-    }
+/* ── Upar wali row: Logo aur Social Media ── */
+.footer-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
 
-    .footer-links {
-      display: flex;
-      gap: 2rem;
-    }
+/* ── Neeche wali row: Copyright aur Links ── */
+.footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
 
-    .footer-links a {
-      font-size: 0.7rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.4);
-      text-decoration: none;
-      transition: color 0.3s;
-    }
+/* Logo Image & Text Fallback */
+.footer-logo {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  letter-spacing: 0.14em;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+}
 
-    .footer-links a:hover { color: var(--gold); }
+.footer-logo-img {
+  max-height: 45px;
+  width: auto;
+  object-fit: contain;
+  /* Agar tera logo black me hai toh usko white karne ke liye. 
+     Agar original color me hi dikhana hai toh ye line hata dena: */
+  filter: brightness(0) invert(1); 
+}
+
+/* Social Media Icons Styling */
+.footer-socials {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.footer-socials a {
+  color: rgba(255, 255, 255, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.footer-socials svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+/* Hover karne pe tera Gold color aayega aur thoda upar uthega */
+.footer-socials a:hover {
+  color: var(--gold);
+  transform: translateY(-3px);
+}
+
+/* Copyright Text */
+.footer-copy {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.1em;
+  margin: 0;
+}
+
+/* Footer Links */
+.footer-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.footer-links a {
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.footer-links a:hover { 
+  color: var(--gold); 
+}
+
+/* 📱 Mobile Responsiveness */
+@media screen and (max-width: 768px) {
+  footer {
+    padding: 2.5rem 1.5rem;
+    gap: 2.5rem;
+  }
+  
+  .footer-top, .footer-bottom {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+}
 
     /* ─────────────────────────────────────────
        BUTTONS
