@@ -333,7 +333,7 @@ const facebookUrl = getValidUrl(content.footer?.socials?.facebook);
           <p className="hero-sub">{content.hero?.subtitle || 'Film · Production · Advertising · Photography'}</p>
           <div className="hero-cta">
             <a href="#projects" className="btn-gold">Our Projects</a>
-            <a href="#about" className="btn-outline" style={{backgroundColor: '#757575', border: '2px solid var(--gold)', color: '#271d08'}}>Learn More</a>
+            <a href="#about" className="btn-outline" style={{backgroundColor: '#757575', border: '2px solid var(--gold)', color: '#ffff'}}>Learn More</a>
           </div>
         </div>
         <div className="scroll-hint" aria-hidden="true"><div className="scroll-line"></div><span>Scroll</span></div>
