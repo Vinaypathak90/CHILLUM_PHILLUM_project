@@ -538,7 +538,279 @@ const ManageContent = () => {
                         ))}
                     </div>
                 </div>
+                {/* =========================================
+    STUDIO SECTION EDIT (FULLY DYNAMIC N-ITEMS)
+========================================= */}
+<div className="admin-section-container mt-12 p-6 bg-white rounded-lg shadow-md border-t-4 border-[#b5862a]">
+    <h2 className="text-2xl font-bold mb-6 text-[#1a1a1a]">Manage Studio Page</h2>
 
+    {/* ── 1. WHAT WE DO (Cards) ── */}
+    <div className="form-group mb-8 p-4 border rounded bg-gray-50">
+        <div className="flex justify-between items-center mb-4">
+            <label className="form-label text-lg font-bold mb-0">Main Studio Categories (What We Do)</label>
+            <button 
+                type="button"
+                onClick={() => {
+                    const newCards = [...(content.studio?.cards || [])];
+                    newCards.push({ label: '', image: '' });
+                    handleChange('studio', 'cards', newCards);
+                }}
+                className="bg-[#b5862a] text-white px-4 py-2 rounded text-sm font-bold hover:bg-[#9a7020] transition"
+            >
+                + Add New Card
+            </button>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {(content.studio?.cards || []).map((card, index) => (
+                <div key={`studio-card-${index}`} className="p-3 border border-gray-200 bg-white rounded relative">
+                    {/* Delete Button */}
+                    <button 
+                        type="button"
+                        onClick={() => {
+                            const newCards = [...content.studio.cards];
+                            newCards.splice(index, 1);
+                            handleChange('studio', 'cards', newCards);
+                        }}
+                        className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                        title="Delete Card"
+                    >
+                        🗑️
+                    </button>
+
+                    <input type="text" className="form-input mb-2 w-[90%]" 
+                        value={card.label || ''} 
+                        onChange={(e) => {
+                            const newCards = [...content.studio.cards];
+                            newCards[index].label = e.target.value;
+                            handleChange('studio', 'cards', newCards);
+                        }} 
+                        placeholder={`Category ${index + 1} Name`} 
+                    />
+                    <input type="text" className="form-input" 
+                        value={card.image || ''} 
+                        onChange={(e) => {
+                            const newCards = [...content.studio.cards];
+                            newCards[index].image = e.target.value;
+                            handleChange('studio', 'cards', newCards);
+                        }} 
+                        placeholder="Image URL" 
+                    />
+                </div>
+            ))}
+            {!(content.studio?.cards?.length > 0) && <p className="text-gray-400 text-sm">No cards added yet. Click 'Add New Card'.</p>}
+        </div>
+    </div>
+
+    {/* ── 2. CAPABILITIES ── */}
+    <div className="form-group mb-8 p-4 border rounded bg-gray-50">
+        <div className="flex justify-between items-center mb-4">
+            <label className="form-label text-lg font-bold mb-0">Capabilities (Glassmorphism Cards)</label>
+            <button 
+                type="button"
+                onClick={() => {
+                    const newCaps = [...(content.studio?.capabilities || [])];
+                    newCaps.push({ icon: '', title: '', image: '', items: [] });
+                    handleChange('studio', 'capabilities', newCaps);
+                }}
+                className="bg-[#b5862a] text-white px-4 py-2 rounded text-sm font-bold hover:bg-[#9a7020] transition"
+            >
+                + Add New Capability
+            </button>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {(content.studio?.capabilities || []).map((cap, index) => (
+                <div key={`cap-${index}`} className="p-3 border border-gray-200 bg-white rounded relative">
+                    <button 
+                        type="button"
+                        onClick={() => {
+                            const newCaps = [...content.studio.capabilities];
+                            newCaps.splice(index, 1);
+                            handleChange('studio', 'capabilities', newCaps);
+                        }}
+                        className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                    >
+                        🗑️
+                    </button>
+
+                    <div className="flex gap-2 mb-2 w-[90%]">
+                        <input type="text" className="form-input w-1/4" 
+                            value={cap.icon || ''} 
+                            onChange={(e) => {
+                                const newCaps = [...content.studio.capabilities];
+                                newCaps[index].icon = e.target.value;
+                                handleChange('studio', 'capabilities', newCaps);
+                            }} 
+                            placeholder="Emoji (📹)" 
+                        />
+                        <input type="text" className="form-input w-3/4" 
+                            value={cap.title || ''} 
+                            onChange={(e) => {
+                                const newCaps = [...content.studio.capabilities];
+                                newCaps[index].title = e.target.value;
+                                handleChange('studio', 'capabilities', newCaps);
+                            }} 
+                            placeholder="Title" 
+                        />
+                    </div>
+                    <input type="text" className="form-input mb-2" 
+                        value={cap.image || ''} 
+                        onChange={(e) => {
+                            const newCaps = [...content.studio.capabilities];
+                            newCaps[index].image = e.target.value;
+                            handleChange('studio', 'capabilities', newCaps);
+                        }} 
+                        placeholder="Background Image URL" 
+                    />
+                    <textarea className="form-input text-sm" rows="2"
+                        value={(cap.items || []).join(', ')} 
+                        onChange={(e) => {
+                            const newCaps = [...content.studio.capabilities];
+                            newCaps[index].items = e.target.value.split(',').map(item => item.trim()).filter(Boolean);
+                            handleChange('studio', 'capabilities', newCaps);
+                        }} 
+                        placeholder="Bullet points (Separate with commas)" 
+                    />
+                </div>
+            ))}
+            {!(content.studio?.capabilities?.length > 0) && <p className="text-gray-400 text-sm">No capabilities added yet.</p>}
+        </div>
+    </div>
+
+    {/* ── 3. OUR PROCESS ── */}
+    <div className="form-group mb-8 p-4 border rounded bg-gray-50">
+        <div className="flex justify-between items-center mb-4">
+            <label className="form-label text-lg font-bold mb-0">Our Process Steps</label>
+            <button 
+                type="button"
+                onClick={() => {
+                    const newProcess = [...(content.studio?.processSteps || [])];
+                    newProcess.push({ step: '', title: '', desc: '' });
+                    handleChange('studio', 'processSteps', newProcess);
+                }}
+                className="bg-[#b5862a] text-white px-4 py-2 rounded text-sm font-bold hover:bg-[#9a7020] transition"
+            >
+                + Add Process Step
+            </button>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {(content.studio?.processSteps || []).map((step, index) => (
+                <div key={`process-${index}`} className="p-3 border border-gray-200 bg-white rounded flex gap-3 relative">
+                    <button 
+                        type="button"
+                        onClick={() => {
+                            const newProcess = [...content.studio.processSteps];
+                            newProcess.splice(index, 1);
+                            handleChange('studio', 'processSteps', newProcess);
+                        }}
+                        className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                    >
+                        🗑️
+                    </button>
+
+                    <input type="text" className="form-input w-16 text-center font-bold h-10" 
+                        value={step.step || ''} 
+                        onChange={(e) => {
+                            const newProcess = [...content.studio.processSteps];
+                            newProcess[index].step = e.target.value;
+                            handleChange('studio', 'processSteps', newProcess);
+                        }} 
+                        placeholder="#" 
+                    />
+                    <div className="w-[85%]">
+                        <input type="text" className="form-input mb-2" 
+                            value={step.title || ''} 
+                            onChange={(e) => {
+                                const newProcess = [...content.studio.processSteps];
+                                newProcess[index].title = e.target.value;
+                                handleChange('studio', 'processSteps', newProcess);
+                            }} 
+                            placeholder="Step Title" 
+                        />
+                        <textarea className="form-input" rows="2"
+                            value={step.desc || ''} 
+                            onChange={(e) => {
+                                const newProcess = [...content.studio.processSteps];
+                                newProcess[index].desc = e.target.value;
+                                handleChange('studio', 'processSteps', newProcess);
+                            }} 
+                            placeholder="Short description..." 
+                        />
+                    </div>
+                </div>
+            ))}
+            {!(content.studio?.processSteps?.length > 0) && <p className="text-gray-400 text-sm">No steps added yet.</p>}
+        </div>
+    </div>
+
+    {/* ── 4. TECHNOLOGY STACK ── */}
+    <div className="form-group mb-8 p-4 border rounded bg-gray-50">
+        <div className="flex justify-between items-center mb-4">
+            <label className="form-label text-lg font-bold mb-0">Technology Stack</label>
+            <button 
+                type="button"
+                onClick={() => {
+                    const newTech = [...(content.studio?.techStack || [])];
+                    newTech.push({ title: '', desc: '', image: '' });
+                    handleChange('studio', 'techStack', newTech);
+                }}
+                className="bg-[#b5862a] text-white px-4 py-2 rounded text-sm font-bold hover:bg-[#9a7020] transition"
+            >
+                + Add Tech Stack
+            </button>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {(content.studio?.techStack || []).map((tech, index) => (
+                <div key={`tech-${index}`} className="p-3 border border-gray-200 bg-white rounded relative">
+                    <button 
+                        type="button"
+                        onClick={() => {
+                            const newTech = [...content.studio.techStack];
+                            newTech.splice(index, 1);
+                            handleChange('studio', 'techStack', newTech);
+                        }}
+                        className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                    >
+                        🗑️
+                    </button>
+
+                    <input type="text" className="form-input mb-2 font-bold w-[85%]" 
+                        value={tech.title || ''} 
+                        onChange={(e) => {
+                            const newTech = [...content.studio.techStack];
+                            newTech[index].title = e.target.value;
+                            handleChange('studio', 'techStack', newTech);
+                        }} 
+                        placeholder="Tool Name" 
+                    />
+                    <input type="text" className="form-input mb-2 text-sm" 
+                        value={tech.desc || ''} 
+                        onChange={(e) => {
+                            const newTech = [...content.studio.techStack];
+                            newTech[index].desc = e.target.value;
+                            handleChange('studio', 'techStack', newTech);
+                        }} 
+                        placeholder="Short description" 
+                    />
+                    <input type="text" className="form-input text-sm" 
+                        value={tech.image || ''} 
+                        onChange={(e) => {
+                            const newTech = [...content.studio.techStack];
+                            newTech[index].image = e.target.value;
+                            handleChange('studio', 'techStack', newTech);
+                        }} 
+                        placeholder="Image URL" 
+                    />
+                </div>
+            ))}
+            {!(content.studio?.techStack?.length > 0) && <p className="text-gray-400 text-sm">No tech stack added yet.</p>}
+        </div>
+    </div>
+
+</div>
                 {/* ── CONTACT DETAILS EDIT ── */}
                 <div className="form-section">
                     <div className="section-header">

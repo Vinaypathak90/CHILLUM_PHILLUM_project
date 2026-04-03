@@ -81,7 +81,25 @@ const pageContentSchema = new mongoose.Schema({
         image: { type: String },
         label: { type: String },
         description: { type: String }
-    }]
+    }],
+    // 3. Our Process
+        processLabel: { type: String, default: 'Our Process' },
+        processTitleMain: { type: String, default: 'From' },
+        processTitleHighlight: { type: String, default: 'Concept to Delivery' },
+        processSteps: [{
+            step: { type: String },
+            title: { type: String },
+            desc: { type: String }
+        }],
+        techStackLabel: { type: String, default: 'Technology Stack' },
+        techStackTitleMain: { type: String, default: 'Industry-Leading' },
+        techStackTitleHighlight: { type: String, default: 'Tools & Software' },
+        techStackDescription: { type: String, default: 'We utilize the latest in creative production...' },
+        techStack: [{
+            title: { type: String },
+            desc: { type: String },
+            image: { type: String }
+        }]
   },
 
   // ── 5. CONTACT SECTION ──

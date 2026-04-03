@@ -35,11 +35,11 @@ const Navbar = ({ navData }) => {
         {/* Desktop links */}
         <ul className="nav-links desktop-links">
           <li><a href="/about">About</a></li>
-          <li><a href="#studio">The Studio</a></li>
-          <li><a href="#team">Our Team</a></li>
-          <li><a href="#projects">Our Projects</a></li>
-          <li><a href="#news">Our Campaigns</a></li>
-          <li><a href="#contact">Contact</a></li>
+          <li><a href="/studio">The Studio</a></li>
+          <li><a href="/team">Our Team</a></li>
+          <li><a href="/projects">Our Projects</a></li>
+          <li><a href="/news">Our Campaigns</a></li>
+          <li><a href="/contact">Contact</a></li>
         </ul>
 
         {/* Hamburger button */}
