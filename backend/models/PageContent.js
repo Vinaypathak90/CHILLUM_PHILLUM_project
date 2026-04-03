@@ -42,13 +42,11 @@ const pageContentSchema = new mongoose.Schema({
         label: { type: String }   // e.g., "Projects"
     }],
     // Array for the 3 images shown in the about section grid
-    images: [{ type: String }] ,
+    images: [{ type: String }],
 
     // 🔥 NAYE FIELDS YAHAN HAIN 🔥
     
-    
-
-    // 2. Our Journey Section
+    // Our Journey Section
     journeyLabel: { type: String, default: 'Our Journey' },
     journeyTitleMain: { type: String, default: 'From Humble Beginnings to' },
     journeyTitleHighlight: { type: String, default: 'Industry Leaders' },
@@ -58,7 +56,7 @@ const pageContentSchema = new mongoose.Schema({
         desc: { type: String }
     }],
 
-    // 3. Impact Section
+    // Impact Section
     impactLabel: { type: String, default: 'Our Impact' },
     impactTitleMain: { type: String, default: 'Creating' },
     impactTitleHighlight: { type: String, default: 'Meaningful Work' },
@@ -82,24 +80,38 @@ const pageContentSchema = new mongoose.Schema({
         label: { type: String },
         description: { type: String }
     }],
-    // 3. Our Process
-        processLabel: { type: String, default: 'Our Process' },
-        processTitleMain: { type: String, default: 'From' },
-        processTitleHighlight: { type: String, default: 'Concept to Delivery' },
-        processSteps: [{
-            step: { type: String },
-            title: { type: String },
-            desc: { type: String }
-        }],
-        techStackLabel: { type: String, default: 'Technology Stack' },
-        techStackTitleMain: { type: String, default: 'Industry-Leading' },
-        techStackTitleHighlight: { type: String, default: 'Tools & Software' },
-        techStackDescription: { type: String, default: 'We utilize the latest in creative production...' },
-        techStack: [{
-            title: { type: String },
-            desc: { type: String },
-            image: { type: String }
-        }]
+    
+    // 🔥 MISSING CAPABILITIES ARRAY ADDED HERE 🔥
+    capabilitiesLabel: { type: String, default: 'Studio Capabilities' },
+    capabilitiesTitleMain: { type: String, default: 'State-of-the-art' },
+    capabilitiesTitleHighlight: { type: String, default: 'Equipment & Technology' },
+    capabilities: [{
+        icon: { type: String },
+        title: { type: String },
+        image: { type: String },
+        items: [{ type: String }] // Array of strings (e.g. ["4K", "Drones"])
+    }],
+
+    // Our Process
+    processLabel: { type: String, default: 'Our Process' },
+    processTitleMain: { type: String, default: 'From' },
+    processTitleHighlight: { type: String, default: 'Concept to Delivery' },
+    processSteps: [{
+        step: { type: String },
+        title: { type: String },
+        desc: { type: String }
+    }],
+
+    // Technology Stack
+    techStackLabel: { type: String, default: 'Technology Stack' },
+    techStackTitleMain: { type: String, default: 'Industry-Leading' },
+    techStackTitleHighlight: { type: String, default: 'Tools & Software' },
+    techStackDescription: { type: String, default: 'We utilize the latest in creative production...' },
+    techStack: [{
+        title: { type: String },
+        desc: { type: String },
+        image: { type: String }
+    }]
   },
 
   // ── 5. CONTACT SECTION ──
@@ -117,13 +129,11 @@ const pageContentSchema = new mongoose.Schema({
   footer: {
     copyrightText: { type: String, default: '© 2026 Chillum Phillum. All rights reserved.' },
     socials: {
-            instagram: { type: String, default: '#' },
-            x: { type: String, default: '#' },
-            facebook: { type: String, default: '#' }
-        }
-  },
-
-  
+        instagram: { type: String, default: '#' },
+        x: { type: String, default: '#' },
+        facebook: { type: String, default: '#' }
+    }
+  }
 
 }, { 
   timestamps: true // Ye automatically save karega ki data kab create ya update hua tha

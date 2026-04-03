@@ -479,7 +479,7 @@ const ManageContent = () => {
 </div>
 
                 {/* ── STUDIO SECTION (WHAT WE DO) ── */}
-                <div className="form-section">
+                <div className="admin-section-container mt-12 p-6 bg-white rounded-lg shadow-md border-t-4 border-[#b5862a]">
                     <div className="section-header">
                         <div className="section-icon">
                             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
@@ -537,70 +537,14 @@ const ManageContent = () => {
                             </div>
                         ))}
                     </div>
-                </div>
+                
                 {/* =========================================
     STUDIO SECTION EDIT (FULLY DYNAMIC N-ITEMS)
 ========================================= */}
-<div className="admin-section-container mt-12 p-6 bg-white rounded-lg shadow-md border-t-4 border-[#b5862a]">
+
     <h2 className="text-2xl font-bold mb-6 text-[#1a1a1a]">Manage Studio Page</h2>
 
-    {/* ── 1. WHAT WE DO (Cards) ── */}
-    <div className="form-group mb-8 p-4 border rounded bg-gray-50">
-        <div className="flex justify-between items-center mb-4">
-            <label className="form-label text-lg font-bold mb-0">Main Studio Categories (What We Do)</label>
-            <button 
-                type="button"
-                onClick={() => {
-                    const newCards = [...(content.studio?.cards || [])];
-                    newCards.push({ label: '', image: '' });
-                    handleChange('studio', 'cards', newCards);
-                }}
-                className="bg-[#b5862a] text-white px-4 py-2 rounded text-sm font-bold hover:bg-[#9a7020] transition"
-            >
-                + Add New Card
-            </button>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {(content.studio?.cards || []).map((card, index) => (
-                <div key={`studio-card-${index}`} className="p-3 border border-gray-200 bg-white rounded relative">
-                    {/* Delete Button */}
-                    <button 
-                        type="button"
-                        onClick={() => {
-                            const newCards = [...content.studio.cards];
-                            newCards.splice(index, 1);
-                            handleChange('studio', 'cards', newCards);
-                        }}
-                        className="absolute top-2 right-2 text-red-500 hover:text-red-700"
-                        title="Delete Card"
-                    >
-                        🗑️
-                    </button>
-
-                    <input type="text" className="form-input mb-2 w-[90%]" 
-                        value={card.label || ''} 
-                        onChange={(e) => {
-                            const newCards = [...content.studio.cards];
-                            newCards[index].label = e.target.value;
-                            handleChange('studio', 'cards', newCards);
-                        }} 
-                        placeholder={`Category ${index + 1} Name`} 
-                    />
-                    <input type="text" className="form-input" 
-                        value={card.image || ''} 
-                        onChange={(e) => {
-                            const newCards = [...content.studio.cards];
-                            newCards[index].image = e.target.value;
-                            handleChange('studio', 'cards', newCards);
-                        }} 
-                        placeholder="Image URL" 
-                    />
-                </div>
-            ))}
-            {!(content.studio?.cards?.length > 0) && <p className="text-gray-400 text-sm">No cards added yet. Click 'Add New Card'.</p>}
-        </div>
-    </div>
+    
 
     {/* ── 2. CAPABILITIES ── */}
     <div className="form-group mb-8 p-4 border rounded bg-gray-50">
