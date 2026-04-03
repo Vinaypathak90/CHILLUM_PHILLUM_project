@@ -53,12 +53,12 @@ const Navbar = ({ navData }) => {
       {/* Mobile menu */}
       <div className="mobile-nav">
         <ul className="nav-links">
-          <li><a href="#about" onClick={handleLinkClick}>About</a></li>
-          <li><a href="#studio" onClick={handleLinkClick}>The Studio</a></li>
-          <li><a href="#team" onClick={handleLinkClick}>Our Team</a></li>
-          <li><a href="#projects" onClick={handleLinkClick}>Our Projects</a></li>
-          <li><a href="#news" onClick={handleLinkClick}>Our Campaigns</a></li>
-          <li><a href="#contact" onClick={handleLinkClick}>Contact</a></li>
+          <li><a href="/about" onClick={handleLinkClick}>About</a></li>
+          <li><a href="/studio" onClick={handleLinkClick}>The Studio</a></li>
+          <li><a href="/team" onClick={handleLinkClick}>Our Team</a></li>
+          <li><a href="/projects" onClick={handleLinkClick}>Our Projects</a></li>
+          <li><a href="/news" onClick={handleLinkClick}>Our Campaigns</a></li>
+          <li><a href="/contact" onClick={handleLinkClick}>Contact</a></li>
         </ul>
       </div>
     </nav>
