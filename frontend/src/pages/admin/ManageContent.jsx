@@ -341,6 +341,143 @@ const ManageContent = () => {
         ))}
     </div>
 </div>
+{/* ── OUR JOURNEY EDIT ── */}
+<div className="form-section mt-6">
+    <div className="section-header">
+        <div className="section-icon">
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        </div>
+        <h3>Our Journey Section</h3>
+    </div>
+    
+    <div className="form-grid-2">
+        <div className="form-group">
+            <label className="form-label">Section Label</label>
+            <input type="text" className="form-input" value={content.about?.journeyLabel || ''} onChange={(e) => handleChange('about', 'journeyLabel', e.target.value)} placeholder="e.g. Our Journey" />
+        </div>
+        <div className="form-group">
+            <label className="form-label">Main Title</label>
+            <input type="text" className="form-input" value={content.about?.journeyTitleMain || ''} onChange={(e) => handleChange('about', 'journeyTitleMain', e.target.value)} placeholder="e.g. From Humble Beginnings to" />
+        </div>
+        <div className="form-group">
+            <label className="form-label">Highlight Title</label>
+            <input type="text" className="form-input" value={content.about?.journeyTitleHighlight || ''} onChange={(e) => handleChange('about', 'journeyTitleHighlight', e.target.value)} placeholder="e.g. Industry Leaders" />
+        </div>
+    </div>
+
+    <label className="form-label mt-4" style={{display: 'block', marginBottom: '10px'}}>Journey Timeline (4 Items)</label>
+    <div className="grid grid-cols-1 gap-4">
+        {[0, 1, 2, 3].map((index) => (
+            <div key={`journey-${index}`} className="studio-card-edit" style={{ display: 'grid', gridTemplateColumns: '100px 1fr', gap: '15px', alignItems: 'start' }}>
+                <div className="form-group mb-0">
+                    <label className="form-label">Year</label>
+                    <input type="text" className="form-input" 
+                        value={content.about?.journey?.[index]?.year || ''} 
+                        onChange={(e) => {
+                            const newJourney = [...(content.about?.journey || [{year:'',title:'',desc:''}, {year:'',title:'',desc:''}, {year:'',title:'',desc:''}, {year:'',title:'',desc:''}])];
+                            newJourney[index] = { ...newJourney[index], year: e.target.value };
+                            handleChange('about', 'journey', newJourney);
+                        }} 
+                        placeholder="e.g. 2019" 
+                    />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div className="form-group mb-0">
+                        <label className="form-label">Title</label>
+                        <input type="text" className="form-input" 
+                            value={content.about?.journey?.[index]?.title || ''} 
+                            onChange={(e) => {
+                                const newJourney = [...(content.about?.journey || [{year:'',title:'',desc:''}, {year:'',title:'',desc:''}, {year:'',title:'',desc:''}, {year:'',title:'',desc:''}])];
+                                newJourney[index] = { ...newJourney[index], title: e.target.value };
+                                handleChange('about', 'journey', newJourney);
+                            }} 
+                            placeholder="e.g. Studio Founded" 
+                        />
+                    </div>
+                    <div className="form-group mb-0">
+                        <label className="form-label">Description</label>
+                        <textarea className="form-input form-textarea" style={{minHeight: '60px'}}
+                            value={content.about?.journey?.[index]?.desc || ''} 
+                            onChange={(e) => {
+                                const newJourney = [...(content.about?.journey || [{year:'',title:'',desc:''}, {year:'',title:'',desc:''}, {year:'',title:'',desc:''}, {year:'',title:'',desc:''}])];
+                                newJourney[index] = { ...newJourney[index], desc: e.target.value };
+                                handleChange('about', 'journey', newJourney);
+                            }} 
+                            placeholder="Brief description..." 
+                        />
+                    </div>
+                </div>
+            </div>
+        ))}
+    </div>
+</div>
+
+{/* ── IMPACT SECTION EDIT ── */}
+<div className="form-section mt-6">
+    <div className="section-header">
+        <div className="section-icon">
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+        </div>
+        <h3>Our Impact Section</h3>
+    </div>
+    
+    <div className="form-grid-2">
+        <div className="form-group">
+            <label className="form-label">Section Label</label>
+            <input type="text" className="form-input" value={content.about?.impactLabel || ''} onChange={(e) => handleChange('about', 'impactLabel', e.target.value)} placeholder="e.g. Our Impact" />
+        </div>
+        <div className="form-group">
+            <label className="form-label">Main Title</label>
+            <input type="text" className="form-input" value={content.about?.impactTitleMain || ''} onChange={(e) => handleChange('about', 'impactTitleMain', e.target.value)} placeholder="e.g. Creating" />
+        </div>
+        <div className="form-group">
+            <label className="form-label">Highlight Title</label>
+            <input type="text" className="form-input" value={content.about?.impactTitleHighlight || ''} onChange={(e) => handleChange('about', 'impactTitleHighlight', e.target.value)} placeholder="e.g. Meaningful Work" />
+        </div>
+        <div className="form-group">
+            <label className="form-label">Title End</label>
+            <input type="text" className="form-input" value={content.about?.impactTitleEnd || ''} onChange={(e) => handleChange('about', 'impactTitleEnd', e.target.value)} placeholder="e.g. Every Day" />
+        </div>
+    </div>
+    
+    <div className="form-group mt-4">
+        <label className="form-label">Impact Description</label>
+        <textarea className="form-input form-textarea" value={content.about?.impactDescription || ''} onChange={(e) => handleChange('about', 'impactDescription', e.target.value)} placeholder="Paragraph text..." />
+    </div>
+
+    <label className="form-label mt-4" style={{display: 'block', marginBottom: '10px'}}>Impact Big Stats (3 Items)</label>
+    <div className="form-grid-2">
+        {[0, 1, 2].map((index) => (
+            <div key={`impact-stat-${index}`} className="studio-card-edit">
+                <div className="form-group">
+                    <label className="form-label">Big Number</label>
+                    <input type="text" className="form-input" 
+                        value={content.about?.impactStats?.[index]?.number || ''} 
+                        onChange={(e) => {
+                            const newImpactStats = [...(content.about?.impactStats || [{number:'',label:''}, {number:'',label:''}, {number:'',label:''}])];
+                            newImpactStats[index] = { ...newImpactStats[index], number: e.target.value };
+                            handleChange('about', 'impactStats', newImpactStats);
+                        }} 
+                        placeholder="e.g. 500M+" 
+                    />
+                </div>
+                <div className="form-group">
+                    <label className="form-label">Label</label>
+                    <input type="text" className="form-input" 
+                        value={content.about?.impactStats?.[index]?.label || ''} 
+                        onChange={(e) => {
+                            const newImpactStats = [...(content.about?.impactStats || [{number:'',label:''}, {number:'',label:''}, {number:'',label:''}])];
+                            newImpactStats[index] = { ...newImpactStats[index], label: e.target.value };
+                            handleChange('about', 'impactStats', newImpactStats);
+                        }} 
+                        placeholder="e.g. Total Views" 
+                    />
+                </div>
+            </div>
+        ))}
+    </div>
+</div>
+
                 {/* ── STUDIO SECTION (WHAT WE DO) ── */}
                 <div className="form-section">
                     <div className="section-header">

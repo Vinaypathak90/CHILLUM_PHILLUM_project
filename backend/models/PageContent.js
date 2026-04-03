@@ -42,7 +42,32 @@ const pageContentSchema = new mongoose.Schema({
         label: { type: String }   // e.g., "Projects"
     }],
     // Array for the 3 images shown in the about section grid
-    images: [{ type: String }] 
+    images: [{ type: String }] ,
+
+    // 🔥 NAYE FIELDS YAHAN HAIN 🔥
+    
+    
+
+    // 2. Our Journey Section
+    journeyLabel: { type: String, default: 'Our Journey' },
+    journeyTitleMain: { type: String, default: 'From Humble Beginnings to' },
+    journeyTitleHighlight: { type: String, default: 'Industry Leaders' },
+    journey: [{
+        year: { type: String },
+        title: { type: String },
+        desc: { type: String }
+    }],
+
+    // 3. Impact Section
+    impactLabel: { type: String, default: 'Our Impact' },
+    impactTitleMain: { type: String, default: 'Creating' },
+    impactTitleHighlight: { type: String, default: 'Meaningful Work' },
+    impactTitleEnd: { type: String, default: 'Every Day' },
+    impactDescription: { type: String, default: "Over the years, we've had the privilege of working with diverse clients..." },
+    impactStats: [{
+        number: { type: String },
+        label: { type: String }
+    }]
   },
 
   // ── 4. THE STUDIO SECTION (What We Do) ──
@@ -78,7 +103,9 @@ const pageContentSchema = new mongoose.Schema({
             x: { type: String, default: '#' },
             facebook: { type: String, default: '#' }
         }
-  }
+  },
+
+  
 
 }, { 
   timestamps: true // Ye automatically save karega ki data kab create ya update hua tha

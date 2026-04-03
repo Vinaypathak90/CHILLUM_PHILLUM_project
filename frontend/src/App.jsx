@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 
 // Public Pages
 import Home from './pages/public/Home';
+import About from './pages/public/About'; // Naya About Page
 
 // Admin Pages
 import Login from './pages/admin/Login';
@@ -27,7 +28,9 @@ function App() {
     <Router>
       <Routes>
         {/* 🌐 MAIN WEBSITE */}
+
         <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
 
         {/* 🔐 ADMIN LOGIN */}
         <Route path="/login" element={<Login />} />
