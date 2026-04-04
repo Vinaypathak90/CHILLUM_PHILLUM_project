@@ -10,6 +10,13 @@ const ManageContent = () => {
         about: { label: '', titleMain: '', titleHighlight: '', titleEnd: '', paragraphs: [''], images: ['', '', ''] },
         studio: { label: '', titleMain: '', titleHighlight: '', titleEnd: '', cards: [{image: '', label: ''}, {image: '', label: ''}, {image: '', label: ''}, {image: '', label: ''}] },
         contact: { email: '', phone: '', location: '' },
+        contactPage: {
+            mapEmbedCode: '',
+            mapHeight: '600px',
+            locations: [],
+            faqs: [],
+            services: []
+        },
         footer: { 
             copyrightText: '', 
             socials: { instagram: '', x: '', facebook: '' } 
@@ -34,6 +41,10 @@ const ManageContent = () => {
                         about: { ...prev.about, ...res.data.data.about },
                         studio: { ...prev.studio, ...res.data.data.studio },
                         contact: { ...prev.contact, ...res.data.data.contact },
+                        contactPage: {
+                            ...prev.contactPage,
+                            ...(res.data.data.contactPage || {})
+                        },
                         footer: {
                             ...prev.footer,
                             ...(res.data.data.footer || {}),
@@ -65,8 +76,8 @@ const ManageContent = () => {
         });
     };
 
-    const addArrayItem = (section, field) => {
-        setContent(prev => ({ ...prev, [section]: { ...prev[section], [field]: [...(prev[section][field] || []), ''] } }));
+    const addArrayItem = (section, field, template = '') => {
+        setContent(prev => ({ ...prev, [section]: { ...prev[section], [field]: [...(prev[section][field] || []), template] } }));
     };
 
     const removeArrayItem = (section, field, index) => {
@@ -74,6 +85,55 @@ const ManageContent = () => {
             const newArr = [...prev[section][field]];
             newArr.splice(index, 1);
             return { ...prev, [section]: { ...prev[section], [field]: newArr } };
+        });
+    };
+
+    // 🔥 CONTACTPAGE HANDLERS - For nested contactPage arrays (locations, faqs, services)
+    const handleContactPageChange = (field, value) => {
+        setContent(prev => ({
+            ...prev,
+            contactPage: {
+                ...prev.contactPage,
+                [field]: value
+            }
+        }));
+    };
+
+    const handleArrayChange = (arrayName, index, field, value) => {
+        setContent(prev => {
+            const newArray = [...(prev.contactPage[arrayName] || [])];
+            newArray[index] = { ...newArray[index], [field]: value };
+            return {
+                ...prev,
+                contactPage: {
+                    ...prev.contactPage,
+                    [arrayName]: newArray
+                }
+            };
+        });
+    };
+
+    const addContactPageArrayItem = (arrayName, template) => {
+        setContent(prev => ({
+            ...prev,
+            contactPage: {
+                ...prev.contactPage,
+                [arrayName]: [...(prev.contactPage[arrayName] || []), template]
+            }
+        }));
+    };
+
+    const removeContactPageArrayItem = (arrayName, index) => {
+        setContent(prev => {
+            const newArray = [...(prev.contactPage[arrayName] || [])];
+            newArray.splice(index, 1);
+            return {
+                ...prev,
+                contactPage: {
+                    ...prev.contactPage,
+                    [arrayName]: newArray
+                }
+            };
         });
     };
 
@@ -154,7 +214,7 @@ const ManageContent = () => {
     };
 
     const handleSave = async (e) => {
-        e.preventDefault();
+        if (e && e.preventDefault) e.preventDefault();
         setSaving(true);
         setMessage('');
         
@@ -778,7 +838,126 @@ const ManageContent = () => {
                         <label className="form-label">Location / Address</label>
                         <input type="text" className="form-input" value={content.contact?.location || ''} onChange={(e) => handleChange('contact', 'location', e.target.value)} />
                     </div>
+                    {/* =========================================================================
+                🔥 2. NEW FEATURES: PREMIUM UI (MAP, LOCATIONS, FAQS, SERVICES) 🔥
+            ========================================================================= */}
+
+            {/* ── DYNAMIC MAP EMBED ── */}
+            <div className="form-section bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mt-10 transition-all hover:shadow-md">
+                <div className="flex justify-between items-center mb-6 border-b border-gray-50 pb-4">
+                    <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                        <span className="p-2 bg-blue-50 text-blue-600 rounded-lg">🗺️</span> Dynamic Map Setup
+                    </h3>
                 </div>
+                <div className="mb-4">
+                    <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">Google Maps iFrame HTML</label>
+                    <p className="text-xs text-gray-400 mb-3">Copy the "Embed a map" HTML from Google Maps and paste it below.</p>
+                    <textarea 
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-blue-500 min-h-[120px] font-mono text-sm text-gray-600 bg-gray-50 transition-colors" 
+                        value={content.contactPage?.mapEmbedCode || ''} 
+                        onChange={(e) => handleContactPageChange('mapEmbedCode', e.target.value)}
+                        placeholder='<iframe src="https://www.google.com/maps/embed?..." width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>'
+                    ></textarea>
+                </div>
+                {content.contactPage?.mapEmbedCode && (
+                    <div className="mt-4 border-2 border-dashed border-gray-200 rounded-xl overflow-hidden h-[250px] [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0 pointer-events-none opacity-80" 
+                         dangerouslySetInnerHTML={{ __html: content.contactPage.mapEmbedCode }}>
+                    </div>
+                )}
+            </div>
+
+            {/* ── OFFICE LOCATIONS ── */}
+            <div className="form-section bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mt-10 transition-all hover:shadow-md">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-4 border-b border-gray-50">
+                    <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                        <span className="p-2 bg-purple-50 text-purple-600 rounded-lg">🏢</span> Office Locations
+                    </h3>
+                    <button type="button" onClick={() => addContactPageArrayItem('locations', {title:'', address:'', phone:'', hours:''})} className="flex items-center gap-2 bg-purple-100 text-purple-700 hover:bg-purple-200 hover:text-purple-800 px-5 py-2.5 rounded-xl font-bold transition-all active:scale-95" style={{margin:0}}>
+                        + Add Office
+                    </button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {(content.contactPage?.locations || []).map((loc, i) => (
+                        <div key={i} className="relative p-6 bg-gray-50 border border-gray-100 rounded-2xl hover:border-purple-200 transition-colors group">
+                            <button type="button" onClick={() => removeContactPageArrayItem('locations', i)} className="absolute -top-3 -right-3 w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm z-10 font-bold">×</button>
+                            <input className="w-full mb-3 px-4 py-2 text-sm rounded-lg border border-gray-200 focus:bg-white outline-none font-bold text-purple-700 transition-colors" placeholder="Location Name (e.g. 📍 Mumbai Studio)" value={loc.title || ''} onChange={e => handleArrayChange('locations', i, 'title', e.target.value)} />
+                            <textarea className="w-full mb-3 px-4 py-3 text-sm rounded-lg border border-gray-200 focus:bg-white outline-none min-h-[80px] transition-colors" placeholder="Full Address" value={loc.address || ''} onChange={e => handleArrayChange('locations', i, 'address', e.target.value)}></textarea>
+                            <input className="w-full mb-3 px-4 py-2 text-sm rounded-lg border border-gray-200 focus:bg-white outline-none transition-colors" placeholder="Phone Contact" value={loc.phone || ''} onChange={e => handleArrayChange('locations', i, 'phone', e.target.value)} />
+                            <input className="w-full px-4 py-2 text-sm rounded-lg border border-gray-200 focus:bg-white outline-none text-gray-500 transition-colors" placeholder="Operating Hours" value={loc.hours || ''} onChange={e => handleArrayChange('locations', i, 'hours', e.target.value)} />
+                        </div>
+                    ))}
+                    {(!content.contactPage?.locations || content.contactPage.locations.length === 0) && <div className="col-span-full py-8 text-center text-gray-400 border-2 border-dashed border-gray-100 rounded-2xl">No office locations added yet.</div>}
+                </div>
+            </div>
+
+            {/* ── FREQUENTLY ASKED QUESTIONS (FAQS) ── */}
+            <div className="form-section bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mt-10 transition-all hover:shadow-md">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-4 border-b border-gray-50">
+                    <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                        <span className="p-2 bg-amber-50 text-amber-600 rounded-lg">❓</span> FAQ Management
+                    </h3>
+                    <button type="button" onClick={() => addContactPageArrayItem('faqs', {question:'', answer:''})} className="flex items-center gap-2 bg-amber-100 text-amber-700 hover:bg-amber-200 px-5 py-2.5 rounded-xl font-bold transition-all active:scale-95" style={{margin:0}}>
+                        + Add Question
+                    </button>
+                </div>
+                <div className="space-y-5">
+                    {(content.contactPage?.faqs || []).map((faq, i) => (
+                        <div key={i} className="relative p-6 bg-gray-50 border border-gray-100 rounded-2xl flex flex-col gap-3 group hover:border-amber-200 transition-colors">
+                            <button type="button" onClick={() => removeContactPageArrayItem('faqs', i)} className="absolute -top-3 -right-3 w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm z-10 font-bold">×</button>
+                            <input className="w-full pr-10 px-4 py-3 rounded-xl border border-gray-200 focus:bg-white focus:border-amber-400 outline-none font-bold text-gray-800 transition-colors" placeholder="Question (e.g. 💬 What is your timeline?)" value={faq.question || ''} onChange={e => handleArrayChange('faqs', i, 'question', e.target.value)} />
+                            <textarea className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:bg-white focus:border-amber-400 outline-none text-sm text-gray-600 min-h-[80px] transition-colors" placeholder="Provide the detailed answer here..." value={faq.answer || ''} onChange={e => handleArrayChange('faqs', i, 'answer', e.target.value)}></textarea>
+                        </div>
+                    ))}
+                    {(!content.contactPage?.faqs || content.contactPage.faqs.length === 0) && <div className="py-8 text-center text-gray-400 border-2 border-dashed border-gray-100 rounded-2xl">No FAQs added yet.</div>}
+                </div>
+            </div>
+
+            {/* ── OUR SERVICES GRID ── */}
+            <div className="form-section bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mt-10 transition-all hover:shadow-md">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-4 border-b border-gray-50">
+                    <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                        <span className="p-2 bg-pink-50 text-pink-600 rounded-lg">✨</span> Our Services
+                    </h3>
+                    <button type="button" onClick={() => addContactPageArrayItem('services', {icon:'', title:'', desc:''})} className="flex items-center gap-2 bg-pink-100 text-pink-700 hover:bg-pink-200 px-5 py-2.5 rounded-xl font-bold transition-all active:scale-95" style={{margin:0}}>
+                        + Add Service
+                    </button>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5">
+                    {(content.contactPage?.services || []).map((srv, i) => (
+                        <div key={i} className="relative p-5 bg-gray-50 border border-gray-100 rounded-xl text-center hover:border-pink-200 transition-colors group shadow-sm hover:shadow-md">
+                            <button type="button" onClick={() => removeContactPageArrayItem('services', i)} className="absolute -top-2 -right-2 text-red-500 text-sm font-bold bg-red-50 hover:bg-red-500 hover:text-white rounded-full w-6 h-6 flex items-center justify-center shadow-sm transition-all z-10">×</button>
+                            <input className="w-full mb-3 mt-1 text-center text-3xl bg-transparent outline-none focus:scale-110 transition-transform" placeholder="Icon (🎬)" value={srv.icon || ''} onChange={e => handleArrayChange('services', i, 'icon', e.target.value)} />
+                            <input className="w-full mb-3 text-center text-sm font-bold bg-white border border-gray-200 focus:border-pink-400 rounded-lg px-2 py-2 outline-none transition-colors" placeholder="Service Title" value={srv.title || ''} onChange={e => handleArrayChange('services', i, 'title', e.target.value)} />
+                            <textarea className="w-full text-center text-xs text-gray-500 bg-white border border-gray-200 focus:border-pink-400 rounded-lg px-2 py-2 outline-none min-h-[70px] resize-none transition-colors" placeholder="Short Desc" value={srv.desc || ''} onChange={e => handleArrayChange('services', i, 'desc', e.target.value)}></textarea>
+                        </div>
+                    ))}
+                    {(!content.contactPage?.services || content.contactPage.services.length === 0) && <div className="col-span-full py-8 text-center text-gray-400 border-2 border-dashed border-gray-100 rounded-2xl">No services added yet.</div>}
+                </div>
+            </div>
+
+            {/* ── STICKY GLOBAL SAVE BUTTON ── */}
+            {/* <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-4xl px-4 z-[100]">
+                <button 
+                    type="button"
+                    onClick={handleSave} 
+                    disabled={saving} 
+                    className={`w-full flex items-center justify-center gap-3 ${saving ? 'bg-gray-800 text-gray-400 cursor-not-allowed' : 'bg-gray-900 hover:bg-black text-white active:scale-[0.98]'} p-5 rounded-2xl text-lg font-black uppercase tracking-widest shadow-[0_20px_50px_rgba(0,0,0,0.25)] border border-gray-700 transition-all duration-300`}
+                >
+                    {saving ? (
+                        <>
+                            <svg className="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            Saving Data...
+                        </>
+                    ) : (
+                        <>
+                            <span className="text-emerald-400 text-2xl">💾</span> 
+                            Save All Content Settings
+                        </>
+                    )}
+                </button>
+            </div> */}
+                </div>
+                
 {/* 🔥 NAYA: FOOTER & SOCIAL MEDIA SECTION ── */}
                 <div className="form-section" style={{ backgroundColor: '#fdfbf7', border: '1px solid #e2e8f0' }}>
                     <div className="section-header">

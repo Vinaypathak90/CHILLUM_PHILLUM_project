@@ -216,7 +216,62 @@ projectsPage: {
             label2: { type: String }  // e.g., "Increase"
         }]
     },
-  // ── 6. FOOTER ──
+  
+  // ── 6. CONTACT PAGE ──
+  contactPage: {
+    // Hero Section
+    heroTitleMain: { type: String, default: 'Get In' },
+    heroTitleHighlight: { type: String, default: 'Touch' },
+    heroSubtitle: { type: String, default: "Ready to create something amazing? Let's talk about your next project and bring your vision to reality." },
+    heroBackgroundImage: { type: String, default: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&q=80' },
+
+    // Contact Form Section
+    contactLabel: { type: String, default: 'Get In Touch' },
+    contactTitleMain: { type: String, default: "Let's Create Something" },
+    contactTitleHighlight: { type: String, default: 'Remarkable' },
+    contactDesc: { type: String, default: "We're always looking for exciting projects and bold collaborators. Whether you're a filmmaker, brand, or storyteller — reach out and let's make something together." },
+    email: { type: String, default: 'hello@chillumphillum.com' },
+    phone: { type: String, default: '+91 99999 99999' },
+    locationText: { type: String, default: 'India' },
+
+    // Map Embed Code
+    mapEmbedCode: { type: String, default: '' },
+    mapHeight: { type: String, default: '600px' },
+
+    // Locations Section
+    locationsLabel: { type: String, default: 'Our Locations' },
+    locationsTitleMain: { type: String, default: 'Where to' },
+    locationsTitleHighlight: { type: String, default: 'Find Us' },
+    locations: [{
+        title: { type: String },
+        address: { type: String },
+        phone: { type: String },
+        hours: { type: String }
+    }],
+
+    // FAQ Section
+    faqLabel: { type: String, default: 'FAQ' },
+    faqTitleMain: { type: String, default: 'Common' },
+    faqTitleHighlight: { type: String, default: 'Questions' },
+    faqs: [{
+        question: { type: String },
+        answer: { type: String }
+    }],
+
+    // Services Section
+    servicesLabel: { type: String, default: 'Our Services' },
+    servicesTitleMain: { type: String, default: 'Comprehensive Creative' },
+    servicesTitleHighlight: { type: String, default: 'Solutions' },
+    services: [{
+        icon: { type: String },
+        title: { type: String },
+        desc: { type: String }
+    }],
+
+    
+  },
+
+  // ── 7. FOOTER ──
   footer: {
     copyrightText: { type: String, default: '© 2026 Chillum Phillum. All rights reserved.' },
     socials: {

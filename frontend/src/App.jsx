@@ -6,7 +6,9 @@ import About from './pages/public/About'; // Naya About Page
 import Studio from './pages/public/Studio';
 import Team from './pages/public/Team';
 import Projects from './pages/public/Projects';
-import Campaigns from './pages/public/Campaigns'; // Naya Campaigns Page
+import Campaigns from './pages/public/Campaigns'; 
+import Contact from './pages/public/Contact';
+// Naya Campaigns Page
 // Admin Pages
 import Login from './pages/admin/Login';
 import Dashboard from './pages/admin/Dashboard';
@@ -38,6 +40,7 @@ function App() {
         <Route path="/team" element={<Team />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/campaigns" element={<Campaigns />} />
+        <Route path="/contact" element={<Contact />} />
 
 
         {/* 🔐 ADMIN LOGIN */}
