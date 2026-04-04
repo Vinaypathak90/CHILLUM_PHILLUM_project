@@ -34,11 +34,16 @@ const updatePageContent = async (req, res) => {
         let content = await PageContent.findOne();
 
         if (content) {
-            // Update existing document
-            content = await PageContent.findOneAndUpdate({}, req.body, {
-                new: true,
-                runValidators: true
-            });
+            // Update existing document - use $set to merge data properly
+            content = await PageContent.findOneAndUpdate(
+                {},
+                { $set: req.body },
+                {
+                    new: true,
+                    runValidators: true,
+                    upsert: false
+                }
+            );
         } else {
             // Create the first document if it doesn't exist
             content = await PageContent.create(req.body);

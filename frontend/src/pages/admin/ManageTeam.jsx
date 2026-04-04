@@ -48,6 +48,18 @@ const ManageTeam = () => {
 
     useEffect(() => {
         fetchTeam();
+        // Also fetch and load team page content data
+        const fetchTeamPageContent = async () => {
+            try {
+                const res = await axios.get(`${config.API_BASE_URL}/page-content`);
+                if (res.data.success && res.data.data?.team) {
+                    setTeamData(prev => ({ ...prev, ...res.data.data.team }));
+                }
+            } catch (err) {
+                console.error("Error fetching team page content:", err);
+            }
+        };
+        fetchTeamPageContent();
     }, []);
 
     // Handle Form Input changes for member form

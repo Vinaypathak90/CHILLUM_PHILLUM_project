@@ -125,6 +125,33 @@ const pageContentSchema = new mongoose.Schema({
     location: { type: String, default: 'India' }
   },
 
+  // ── 5.5. TEAM PAGE SECTION ──
+  team: {
+    cultureLabel: { type: String, default: 'Studio Culture' },
+    cultureTitleMain: { type: String, default: 'Built on' },
+    cultureTitleHighlight: { type: String, default: 'Collaboration & Innovation' },
+    cultureDesc: { type: String, default: "Our studio thrives on a culture of creative collaboration, continuous learning, and pushing artistic boundaries." },
+    cultureCards: [{
+        icon: { type: String },
+        title: { type: String },
+        desc: { type: String }
+    }],
+    testimonialsLabel: { type: String, default: 'What Our Team Says' },
+    testimonialsTitleMain: { type: String, default: 'Working at' },
+    testimonialsTitleHighlight: { type: String, default: 'Chillum Phillum' },
+    testimonials: [{
+        quote: { type: String },
+        name: { type: String },
+        role: { type: String }
+    }],
+    careerLabel: { type: String, default: 'Career With Us' },
+    careerTitleMain: { type: String, default: "We're Always Looking for" },
+    careerTitleHighlight: { type: String, default: 'Talented Creators' },
+    careerDesc: { type: String, default: "If you're passionate about filmmaking, photography, design, or any aspect of creative production, we'd love to hear from you." },
+    careerButtonText: { type: String, default: 'Get In Touch' },
+    careerButtonLink: { type: String, default: '/contact' }
+  },
+
   // ── 6. FOOTER ──
   footer: {
     copyrightText: { type: String, default: '© 2026 Chillum Phillum. All rights reserved.' },
