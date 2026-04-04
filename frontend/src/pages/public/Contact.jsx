@@ -70,12 +70,13 @@ const Contact = () => {
 
   // ─── EXTRACT BACKEND DATA & FALLBACKS ───
   const pageData = content?.contactPage || {};
-
-  const locations = pageData.locations?.length > 0 ? pageData.locations : [
-    { title: '📍 Mumbai Studio', address: 'Bandra West, Mumbai - 400050', phone: '+91 22 1234 5678', hours: 'Mon-Fri: 10 AM - 7 PM' },
-    { title: '📍 Delhi Office', address: 'Connaught Place, New Delhi - 110001', phone: '+91 11 1234 5678', hours: 'Mon-Fri: 10 AM - 7 PM' },
-    { title: '📍 Bangalore Hub', address: 'Whitefield, Bangalore - 560066', phone: '+91 80 1234 5678', hours: 'Mon-Fri: 10 AM - 7 PM' }
-  ];
+  
+  // 🔥 Support BOTH old and new data structures from backend
+  const locations = pageData.locations?.length > 0 ? pageData.locations : (content?.locations?.length > 0 ? content.locations : [
+    { title: 'Mumbai Studio', address: 'Bandra West, Mumbai - 400050', phone: '+91 22 1234 5678', hours: 'Mon-Fri: 10 AM - 7 PM' },
+    { title: 'Delhi Office', address: 'Connaught Place, New Delhi - 110001', phone: '+91 11 1234 5678', hours: 'Mon-Fri: 10 AM - 7 PM' },
+    { title: 'Bangalore Hub', address: 'Whitefield, Bangalore - 560066', phone: '+91 80 1234 5678', hours: 'Mon-Fri: 10 AM - 7 PM' }
+  ]);
 
   const faqs = pageData.faqs?.length > 0 ? pageData.faqs : [
     { question: '💬 What is your typical project timeline?', answer: 'Project timelines vary based on scope, but typically range from 2-8 weeks. We discuss timelines during the discovery phase.' },
@@ -115,7 +116,7 @@ const Contact = () => {
           ──────────────────────────────────────────────────────────────── */}
       {pageData.mapEmbedCode && (
         <section className="w-full bg-[#f7f4ef] pt-0" style={{ height: pageData.mapHeight || '600px' }}>
-          <div 
+          <div bha
             className="w-full h-full grayscale-[25%] hover:grayscale-0 transition-all duration-700 [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0" 
             dangerouslySetInnerHTML={{ __html: pageData.mapEmbedCode }} 
           />
@@ -138,45 +139,28 @@ const Contact = () => {
             {pageData.locationsTitleMain || 'Where to'} <em className="italic text-[#b5862a]">{pageData.locationsTitleHighlight || 'Find Us'}</em>
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {locations.map((loc, i) => (
-              <div 
-                key={i} 
-                className="group relative p-8 rounded-2xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_25px_50px_rgba(181,134,42,0.25)] border border-white/30 backdrop-blur-md"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
-                  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.1), inset 0 1px 1px 0 rgba(255,255,255,0.2)'
-                }}
-              >
-                {/* Animated Background Gradient */}
-                <div className="absolute inset-0 bg-gradient-to-br from-[#b5862a]/10 via-transparent to-[#b5862a]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-                <div className="relative z-10">
-                  <h3 className="text-[1.15rem] mb-6 text-[#b5862a] font-bold flex items-center gap-3 group-hover:text-[#d4a84b] transition-colors">
-                    <span className="text-2xl group-hover:scale-110 transition-transform duration-300">{loc.title.charAt(0)}</span>
-                    {loc.title}
-                  </h3>
-                  
-                  <div className="space-y-4 text-[0.95rem]">
-                    <div className="flex gap-3">
-                      <span className="text-[#b5862a] font-bold min-w-fit">📍</span>
-                      <p className="text-[#555] leading-relaxed">{loc.address}</p>
-                    </div>
-                    <div className="flex gap-3">
-                      <span className="text-[#b5862a] font-bold min-w-fit">📞</span>
-                      <a href={`tel:${loc.phone}`} className="text-[#1a1a1a] font-medium hover:text-[#b5862a] transition-colors">
-                        {loc.phone}
-                      </a>
-                    </div>
-                    <div className="flex gap-3">
-                      <span className="text-[#b5862a] font-bold min-w-fit">🕐</span>
-                      <p className="text-[#555]">{loc.hours}</p>
-                    </div>
+              <div key={i} className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3 mb-4">
+                  <span className="text-2xl">📍</span>
+                  <h3 className="text-[1.1rem] font-bold text-[#b5862a]">{loc.title}</h3>
+                </div>
+                
+                <div className="space-y-3 text-sm">
+                  <div>
+                    <p className="font-semibold text-[#333] mb-1">Address:</p>
+                    <p className="text-[#666]">{loc.address}</p>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-[#333] mb-1">Phone:</p>
+                    <a href={`tel:${loc.phone}`} className="text-[#b5862a] hover:text-[#d4a84b]">{loc.phone}</a>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-[#333] mb-1\">Hours:</p>
+                    <p className="text-[#666]">{loc.hours}</p>
                   </div>
                 </div>
-
-                {/* Border Animation */}
-                <div className="absolute inset-0 rounded-2xl p-[1px] bg-gradient-to-r from-[#b5862a]/20 via-[#b5862a]/10 to-[#b5862a]/5 group-hover:from-[#b5862a]/40 group-hover:via-[#b5862a]/20 group-hover:to-[#b5862a]/10 transition-all duration-500 pointer-events-none"></div>
               </div>
             ))}
           </div>

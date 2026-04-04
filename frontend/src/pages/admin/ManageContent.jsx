@@ -878,12 +878,13 @@ const ManageContent = () => {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {(content.contactPage?.locations || []).map((loc, i) => (
-                        <div key={i} className="relative p-6 bg-gray-50 border border-gray-100 rounded-2xl hover:border-purple-200 transition-colors group">
-                            <button type="button" onClick={() => removeContactPageArrayItem('locations', i)} className="absolute -top-3 -right-3 w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm z-10 font-bold">×</button>
-                            <input className="w-full mb-3 px-4 py-2 text-sm rounded-lg border border-gray-200 focus:bg-white outline-none font-bold text-purple-700 transition-colors" placeholder="Location Name (e.g. 📍 Mumbai Studio)" value={loc.title || ''} onChange={e => handleArrayChange('locations', i, 'title', e.target.value)} />
-                            <textarea className="w-full mb-3 px-4 py-3 text-sm rounded-lg border border-gray-200 focus:bg-white outline-none min-h-[80px] transition-colors" placeholder="Full Address" value={loc.address || ''} onChange={e => handleArrayChange('locations', i, 'address', e.target.value)}></textarea>
-                            <input className="w-full mb-3 px-4 py-2 text-sm rounded-lg border border-gray-200 focus:bg-white outline-none transition-colors" placeholder="Phone Contact" value={loc.phone || ''} onChange={e => handleArrayChange('locations', i, 'phone', e.target.value)} />
-                            <input className="w-full px-4 py-2 text-sm rounded-lg border border-gray-200 focus:bg-white outline-none text-gray-500 transition-colors" placeholder="Operating Hours" value={loc.hours || ''} onChange={e => handleArrayChange('locations', i, 'hours', e.target.value)} />
+                        <div key={i} className="relative p-6 bg-white border-2 border-purple-200 rounded-2xl hover:border-purple-400 hover:shadow-lg transition-all group">
+                            <button type="button" onClick={() => removeContactPageArrayItem('locations', i)} className="absolute -top-3 -right-3 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-all shadow-md z-10 font-bold">×</button>
+                            <div className="absolute top-3 right-10 text-xs text-purple-500 font-semibold bg-purple-50 px-2 py-1 rounded">EDIT</div>
+                            <input className="w-full mb-3 px-4 py-3 text-sm rounded-lg border-2 border-purple-100 bg-white focus:bg-purple-50 focus:border-purple-400 outline-none font-semibold text-purple-700 transition-all placeholder:text-gray-400" placeholder="Location Name (e.g. 📍 Mumbai Studio)" value={loc.title || ''} onChange={e => handleArrayChange('locations', i, 'title', e.target.value)} />
+                            <textarea className="w-full mb-3 px-4 py-3 text-sm rounded-lg border-2 border-purple-100 bg-white focus:bg-purple-50 focus:border-purple-400 outline-none min-h-[80px] transition-all placeholder:text-gray-400" placeholder="Full Address" value={loc.address || ''} onChange={e => handleArrayChange('locations', i, 'address', e.target.value)}></textarea>
+                            <input className="w-full mb-3 px-4 py-3 text-sm rounded-lg border-2 border-purple-100 bg-white focus:bg-purple-50 focus:border-purple-400 outline-none transition-all placeholder:text-gray-400" placeholder="Phone Contact" value={loc.phone || ''} onChange={e => handleArrayChange('locations', i, 'phone', e.target.value)} />
+                            <input className="w-full px-4 py-3 text-sm rounded-lg border-2 border-purple-100 bg-white focus:bg-purple-50 focus:border-purple-400 outline-none transition-all placeholder:text-gray-400" placeholder="Operating Hours" value={loc.hours || ''} onChange={e => handleArrayChange('locations', i, 'hours', e.target.value)} />
                         </div>
                     ))}
                     {(!content.contactPage?.locations || content.contactPage.locations.length === 0) && <div className="col-span-full py-8 text-center text-gray-400 border-2 border-dashed border-gray-100 rounded-2xl">No office locations added yet.</div>}
@@ -936,26 +937,8 @@ const ManageContent = () => {
             </div>
 
             {/* ── STICKY GLOBAL SAVE BUTTON ── */}
-            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-4xl px-4 z-[100]">
-                <button 
-                    type="button"
-                    onClick={handleSave} 
-                    disabled={saving} 
-                    className={`w-full flex items-center justify-center gap-3 ${saving ? 'bg-gray-800 text-gray-400 cursor-not-allowed' : 'bg-gray-900 hover:bg-black text-white active:scale-[0.98]'} p-5 rounded-2xl text-lg font-black uppercase tracking-widest shadow-[0_20px_50px_rgba(0,0,0,0.25)] border border-gray-700 transition-all duration-300`}
-                >
-                    {saving ? (
-                        <>
-                            <svg className="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                            Saving Data...
-                        </>
-                    ) : (
-                        <>
-                            <span className="text-emerald-400 text-2xl">💾</span> 
-                            Save All Content Settings
-                        </>
-                    )}
-                </button>
-            </div>
+           
+
                 </div>
                 
 {/* 🔥 NAYA: FOOTER & SOCIAL MEDIA SECTION ── */}
