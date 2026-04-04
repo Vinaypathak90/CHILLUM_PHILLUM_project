@@ -936,7 +936,7 @@ const ManageContent = () => {
             </div>
 
             {/* ── STICKY GLOBAL SAVE BUTTON ── */}
-            {/* <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-4xl px-4 z-[100]">
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-4xl px-4 z-[100]">
                 <button 
                     type="button"
                     onClick={handleSave} 
@@ -955,7 +955,7 @@ const ManageContent = () => {
                         </>
                     )}
                 </button>
-            </div> */}
+            </div>
                 </div>
                 
 {/* 🔥 NAYA: FOOTER & SOCIAL MEDIA SECTION ── */}
