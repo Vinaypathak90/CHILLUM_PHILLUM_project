@@ -3,17 +3,21 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import config from "../../config";
 
+// 🔥 NAYE IMPORTS YAHAN HAIN (Path check kar lena agar firebaseConfig kisi aur folder me ho)
+import { auth, googleProvider } from '../../firebaseConfig'; 
+import { signInWithPopup } from 'firebase/auth';
+
 const Login = () => {
     // ─── AUTH MODES ───
     const [isLogin, setIsLogin] = useState(true);
     const [isForgotPassword, setIsForgotPassword] = useState(false);
-    const [otpMode, setOtpMode] = useState(false); // 🔥 NEW: OTP Screen Toggle
+    const [otpMode, setOtpMode] = useState(false);
 
     // ─── FORM STATES ───
     const [name, setName] = useState(''); 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [otp, setOtp] = useState(''); // 🔥 NEW: OTP Input State
+    const [otp, setOtp] = useState('');
     
     // ─── UI STATES ───
     const [error, setError] = useState('');
@@ -33,45 +37,37 @@ const Login = () => {
         setLoading(true);
 
         try {
-            // ─── CASE A: FORGOT PASSWORD FLOW ───
             if (isForgotPassword) {
                 if (!otpMode) {
-                    // Step 1: Request OTP for Password Reset
                     const res = await axios.post(`${config.API_BASE_URL}/auth/forgot-password-otp`, { email });
                     if (res.data.success) {
                         setSuccessMsg('OTP sent to your email!');
-                        setOtpMode(true); // Show OTP Input
+                        setOtpMode(true);
                     }
                 } else {
-                    // Step 2: Verify OTP & Reset Password
                     const res = await axios.post(`${config.API_BASE_URL}/auth/reset-password`, { email, otp, newPassword: password });
                     if (res.data.success) {
                         setSuccessMsg('Password reset successful! Please sign in.');
-                        setTimeout(() => toggleMode(true), 2000); // Switch to login
+                        setTimeout(() => toggleMode(true), 2000);
                     }
                 }
             } 
-            // ─── CASE B: SIGNUP FLOW ───
             else if (!isLogin) {
                 if (!otpMode) {
-                    // Step 1: Request OTP for New Account
                     const res = await axios.post(`${config.API_BASE_URL}/auth/request-otp`, { name, email, password });
                     if (res.data.success) {
                         setSuccessMsg('OTP sent! Please check your email.');
-                        setOtpMode(true); // Show OTP input
+                        setOtpMode(true);
                     }
                 } else {
-                    // Step 2: Verify OTP & Create Account
                     const res = await axios.post(`${config.API_BASE_URL}/auth/verify-otp`, { name, email, password, otp });
                     if (res.data.success) {
                         setSuccessMsg('Account created successfully! Redirecting...');
-                        // Auto Login after signup
                         localStorage.setItem('accessToken', res.data.accessToken);
                         setTimeout(() => navigate('/dashboard'), 2000);
                     }
                 }
             } 
-            // ─── CASE C: STANDARD LOGIN FLOW ───
             else {
                 const res = await axios.post(`${config.API_BASE_URL}/auth/login`, { email, password }, { withCredentials: true });
                 if (res.data.success) {
@@ -88,11 +84,32 @@ const Login = () => {
     };
 
     // ==========================================
-    // 2. GOOGLE LOGIN (Backend OAuth Hook)
+    // 🔥 2. GOOGLE LOGIN (FIXED: NOW USES FIREBASE & POST REQUEST) 🔥
     // ==========================================
-    const handleGoogleAuth = () => {
-        // Redirect to your Node.js Google OAuth Endpoint
-        window.location.href = `${config.API_BASE_URL}/auth/google`;
+    const handleGoogleAuth = async () => {
+        setError('');
+        setLoading(true);
+        try {
+            // 1. Firebase se popup khulwao aur token lo
+            const result = await signInWithPopup(auth, googleProvider);
+            const idToken = await result.user.getIdToken();
+            
+            // 2. Wo token apne backend pe bhej do (POST request)
+            const response = await axios.post(`${config.API_BASE_URL}/auth/google`, { 
+                token: idToken 
+            }, { withCredentials: true });
+
+            // 3. Agar backend ne success bola, toh dashboard pe bhej do
+            if (response.data.success) {
+                localStorage.setItem('accessToken', response.data.accessToken);
+                navigate('/dashboard');
+            }
+        } catch (err) {
+            console.error("Google Auth Error:", err);
+            setError('Google Sign-In failed. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     // ==========================================
@@ -101,7 +118,7 @@ const Login = () => {
     const toggleMode = (forceLogin = false) => {
         setIsLogin(forceLogin === true ? true : !isLogin);
         setIsForgotPassword(false);
-        setOtpMode(false); // Reset OTP Screen
+        setOtpMode(false);
         setError('');
         setSuccessMsg('');
         setName('');
@@ -142,7 +159,7 @@ const Login = () => {
                 {error && <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm text-center font-semibold animate-[fadeIn_0.3s_ease-out]">{error}</div>}
                 {successMsg && <div className="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 text-sm text-center font-semibold animate-[fadeIn_0.3s_ease-out]">{successMsg}</div>}
 
-                {/* ── GOOGLE AUTH BUTTON (Only on normal Login/Signup screens) ── */}
+                {/* ── GOOGLE AUTH BUTTON ── */}
                 {!isForgotPassword && !otpMode && (
                     <div className="mb-6 animate-[fadeIn_0.3s_ease-out]">
                         <button type="button" onClick={handleGoogleAuth} disabled={loading} className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-200 text-gray-700 font-bold py-3.5 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 active:scale-[0.98] disabled:opacity-50">
@@ -162,10 +179,8 @@ const Login = () => {
                 {/* ── FORMS ── */}
                 <form onSubmit={handleAuth} className="flex flex-col gap-5">
                     
-                    {/* STEP 1: INITIAL DETAILS (Hidden if OTP Mode is active) */}
                     {!otpMode && (
                         <div className="flex flex-col gap-5 animate-[fadeIn_0.3s_ease-out]">
-                            {/* NAME INPUT (Signup Only) */}
                             {!isLogin && !isForgotPassword && (
                                 <div className="flex flex-col gap-2">
                                     <label className="block text-gray-900 text-sm font-bold ml-1">Full Name</label>
@@ -176,7 +191,6 @@ const Login = () => {
                                 </div>
                             )}
 
-                            {/* EMAIL INPUT */}
                             <div className="flex flex-col gap-2">
                                 <label className="block text-gray-900 text-sm font-bold ml-1">Email Address</label>
                                 <div className="relative">
@@ -185,7 +199,6 @@ const Login = () => {
                                 </div>
                             </div>
 
-                            {/* PASSWORD INPUT (Hidden in Forgot Password Step 1) */}
                             {!isForgotPassword && (
                                 <div className="flex flex-col gap-2">
                                     <div className="flex justify-between items-center ml-1">
@@ -204,7 +217,6 @@ const Login = () => {
                         </div>
                     )}
 
-                    {/* STEP 2: OTP VERIFICATION BOX (Shows only in OTP Mode) */}
                     {otpMode && (
                         <div className="flex flex-col gap-5 animate-[fadeIn_0.4s_ease-out]">
                             <div className="flex flex-col gap-2">
@@ -220,7 +232,6 @@ const Login = () => {
                                 />
                             </div>
 
-                            {/* IF FORGOT PASSWORD: Ask for new password during OTP step */}
                             {isForgotPassword && (
                                 <div className="flex flex-col gap-2 mt-2">
                                     <label className="block text-gray-900 text-sm font-bold ml-1">New Password</label>
@@ -230,7 +241,6 @@ const Login = () => {
                         </div>
                     )}
 
-                    {/* MAIN SUBMIT BUTTON */}
                     <div className="pt-2">
                         <button type="submit" disabled={loading} className="w-full flex justify-center p-4 border border-transparent rounded-xl shadow-[0_8px_20px_-8px_rgba(41,46,145,0.5)] text-[15px] font-bold text-white bg-[#292e91] hover:bg-[#1e226a] transition-all duration-300 tracking-wide uppercase focus:outline-none focus:ring-4 focus:ring-[#292e91]/30 disabled:opacity-60 disabled:cursor-not-allowed active:scale-[0.98]">
                             {loading ? (
@@ -246,7 +256,6 @@ const Login = () => {
                     </div>
                 </form>
 
-                {/* ── FOOTER TOGGLES ── */}
                 <div className="mt-8 text-center border-t border-gray-100 pt-6">
                     {(isForgotPassword || otpMode) ? (
                         <button type="button" onClick={() => toggleMode(true)} className="text-[#292e91] font-bold text-sm hover:underline focus:outline-none">
@@ -263,7 +272,6 @@ const Login = () => {
                 </div>
             </div>
             
-            {/* BACK TO WEBSITE */}
             <div className="mt-8 text-center">
                 <a href="/" className="text-sm font-semibold text-gray-400 hover:text-[#292e91] transition-colors duration-300">
                     ← Return to Main Site
