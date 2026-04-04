@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './ManageContent.css'; // Importing shared standard admin CSS
-import config from "../../config"; // Any specific campaign CSS
+import './ManageContent.css'; // Consistent admin styles
+import './ManageProjects.css'; 
+import config from "../../config"; // Centralized config for API base URL
 
 const ManageCampaigns = () => {
     const [campaigns, setCampaigns] = useState([]);
@@ -19,13 +20,24 @@ const ManageCampaigns = () => {
         title: '',
         dateString: '',
         excerpt: '', // Card ke upar dikhne wala short text
-        detailedContent: '', // 🔥 NAYA FIELD: Popup me dikhne wali badi news
+        detailedContent: '', // Popup me dikhne wali badi news
         imageUrl: '',
         readMoreLink: '#',
         isPublished: true,
         order: 0
     };
     const [formData, setFormData] = useState(initialFormState);
+
+    // 🔥 NEW: Page Content State (Specialties, Trending, Counters, CTA)
+    const [pageData, setPageData] = useState({
+        specLabel: 'Campaign Specialties', specTitleMain: 'We Excel in', specTitleHighlight: 'Every Campaign Type',
+        specialties: [],
+        trendingLabel: 'Recent Highlights', trendingTitleMain: 'Trending', trendingTitleHighlight: 'Right Now',
+        trending: [],
+        impactLabel: 'Measurable Results', impactTitleMain: 'Campaigns That', impactTitleHighlight: 'Deliver Real Impact',
+        impactStats: [],
+        ctaTitleMain: 'Ready to Bring Your', ctaTitleHighlight: 'Vision to Life?', ctaDesc: '', ctaButtonText: 'Start Your Project', ctaButtonLink: '/contact'
+    });
 
     // Fetch all campaigns on mount
     const fetchCampaigns = async () => {
@@ -39,8 +51,21 @@ const ManageCampaigns = () => {
         }
     };
 
+    // 🔥 NEW: Fetch Global Page Content
+    const fetchPageData = async () => {
+        try {
+            const res = await axios.get(`${config.API_BASE_URL}/page-content`);
+            if (res.data.data?.campaignsPage) {
+                setPageData(prev => ({ ...prev, ...res.data.data.campaignsPage }));
+            }
+        } catch (err) {
+            console.error("Fetch Page Data Error:", err);
+        }
+    };
+
     useEffect(() => {
         fetchCampaigns();
+        fetchPageData(); // Fetching new features data as well
     }, []);
 
     // Handle Form Input changes
@@ -57,7 +82,7 @@ const ManageCampaigns = () => {
         setFormData({ ...formData, isPublished: !formData.isPublished });
     };
 
-    // 🚀 NEW: Handle Image Upload (Cloudinary)
+    // Handle Image Upload
     const handleImageUpload = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -81,7 +106,7 @@ const ManageCampaigns = () => {
         }
     };
 
-    // Submit Handler (Create or Update)
+    // Submit Handler (Create or Update Campaign Post)
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitting(true);
@@ -89,16 +114,13 @@ const ManageCampaigns = () => {
 
         try {
             if (isEditing) {
-                // Update existing campaign
                 await axios.put(`${config.API_BASE_URL}/campaigns/${currentId}`, formData);
                 setMessage({ text: 'Campaign updated successfully! 📢', type: 'success' });
             } else {
-                // Create new campaign
                 await axios.post(`${config.API_BASE_URL}/campaigns`, formData);
                 setMessage({ text: 'New campaign published! 🎉', type: 'success' });
             }
             
-            // Reset form and refresh list
             setFormData(initialFormState);
             setIsEditing(false);
             setCurrentId(null);
@@ -118,7 +140,7 @@ const ManageCampaigns = () => {
             title: campaign.title,
             dateString: campaign.dateString,
             excerpt: campaign.excerpt,
-            detailedContent: campaign.detailedContent || '', // Safely load old data too
+            detailedContent: campaign.detailedContent || '',
             imageUrl: campaign.imageUrl,
             readMoreLink: campaign.readMoreLink || '#',
             isPublished: campaign.isPublished !== false, 
@@ -148,6 +170,34 @@ const ManageCampaigns = () => {
                 alert('Failed to delete campaign.');
             }
         }
+    };
+
+    // 🔥 NEW: Handlers for Page Content Arrays (Specialties, Trending, Stats)
+    const handleArrayChange = (arrayName, index, field, value) => {
+        const newArr = [...(pageData[arrayName] || [])];
+        newArr[index][field] = value;
+        setPageData({ ...pageData, [arrayName]: newArr });
+    };
+
+    const addArrayItem = (arrayName, emptyObj) => {
+        setPageData({ ...pageData, [arrayName]: [...(pageData[arrayName] || []), emptyObj] });
+    };
+
+    const removeArrayItem = (arrayName, index) => {
+        const newArr = pageData[arrayName].filter((_, i) => i !== index);
+        setPageData({ ...pageData, [arrayName]: newArr });
+    };
+
+    const handlePageDataSave = async () => {
+        setSubmitting(true);
+        try {
+            await axios.post(`${config.API_BASE_URL}/page-content`, { campaignsPage: pageData });
+            setMessage({ text: 'Global Page Settings Saved Successfully! 💾', type: 'success' });
+            setTimeout(() => setMessage({ text: '', type: '' }), 3000);
+        } catch (err) {
+            setMessage({ text: 'Error saving page settings!', type: 'error' });
+        }
+        setSubmitting(false);
     };
 
     if (loading) return <div className="loading-text" style={{padding: '20px', fontWeight: 'bold', color: '#6b7280'}}>Loading Campaigns Data...</div>;
@@ -204,7 +254,6 @@ const ManageCampaigns = () => {
                         </div>
                     </div>
 
-                    {/* 🔥 IMAGE UPLOAD UI */}
                     <div className="form-group">
                         <label className="form-label">Cover Image (URL or Upload)</label>
                         <div style={{ display: 'flex', gap: '10px', alignItems: 'center', backgroundColor: '#f9fafb', padding: '10px', borderRadius: '10px', border: '1px solid #e5e7eb' }}>
@@ -216,9 +265,17 @@ const ManageCampaigns = () => {
                                 value={formData.imageUrl} onChange={handleChange}
                                 placeholder="https://images.unsplash.com/photo-..."
                             />
-                           
+                            <div style={{ position: 'relative', overflow: 'hidden' }}>
+                                <button type="button" className="btn-add" style={{ margin: 0, padding: '10px 15px' }}>Upload File</button>
+                                <input 
+                                    type="file" 
+                                    accept="image/*" 
+                                    onChange={handleImageUpload} 
+                                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
+                                />
+                            </div>
                             {formData.imageUrl && (
-                                <button type="button" onClick={() => setFormData({...formData, imageUrl: ''})} className="btn-remove" style={{padding: '10px 15px'}}>Clear</button>
+                                <button type="button" onClick={() => setFormData({...formData, imageUrl: ''})} className="btn-remove" style={{padding: '10px 15px', margin: 0}}>Clear</button>
                             )}
                         </div>
                     </div>
@@ -233,7 +290,6 @@ const ManageCampaigns = () => {
                         ></textarea>
                     </div>
 
-                    {/* 🔥 NEW: DETAILED CONTENT FOR POPUP */}
                     <div className="form-group" style={{marginBottom: '20px'}}>
                         <label className="form-label">Detailed Content (Shows inside the full Popup)</label>
                         <textarea 
@@ -265,7 +321,6 @@ const ManageCampaigns = () => {
                     </div>
 
                     <div className="form-actions" style={{justifyContent: 'space-between', alignItems: 'center'}}>
-                        {/* Custom Published Toggle */}
                         <div className="input-group" style={{ marginBottom: 0, display: 'flex', alignItems: 'center', gap: '15px' }}>
                             <label className="input-label" style={{margin: 0}}>Visibility Status:</label>
                             <div style={{cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px'}} onClick={handleTogglePublish}>
@@ -293,7 +348,7 @@ const ManageCampaigns = () => {
             </div>
 
             {/* ── CAMPAIGNS GRID DISPLAY ── */}
-            <div className="form-section" style={{marginTop: '40px'}}>
+            <div className="form-section" style={{marginTop: '40px', marginBottom: '60px'}}>
                 <div className="section-header">
                     <h3>News & Campaigns Library <span style={{ fontSize: '14px', color: '#6b7280', fontWeight: '400', marginLeft: '10px' }}>({campaigns.length} Total Articles)</span></h3>
                 </div>
@@ -306,8 +361,6 @@ const ManageCampaigns = () => {
                             <div key={camp._id} style={{ border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden', background: '#fff', display: 'flex', flexDirection: 'column' }}>
                                 <div style={{ position: 'relative' }}>
                                     <img src={camp.imageUrl} alt={camp.title} style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
-                                    
-                                    {/* Badges */}
                                     <div style={{ position: 'absolute', top: '10px', left: '10px', background: camp.isPublished ? '#10b981' : '#6b7280', color: 'white', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold' }}>
                                         {camp.isPublished ? 'PUBLISHED' : 'DRAFT'}
                                     </div>
@@ -335,6 +388,87 @@ const ManageCampaigns = () => {
                 </div>
             </div>
 
+            {/* 🔥 NEW FEATURES: PAGE CONTENT SETTINGS START HERE 🔥 */}
+
+            {/* ── SECTION 2: CAMPAIGN SPECIALTIES ── */}
+            <div className="form-section">
+                <div className="section-header" style={{justifyContent:'space-between'}}>
+                    <h3>Campaign Specialties</h3>
+                    <button onClick={() => addArrayItem('specialties', {icon:'', title:'', desc:''})} className="btn-add" style={{margin:0}}>+ Add Specialty</button>
+                </div>
+                <div className="form-grid-2 mb-4">
+                    <div className="form-group"><label className="form-label">Main Title</label><input type="text" className="form-input" value={pageData.specTitleMain || ''} onChange={e => setPageData({...pageData, specTitleMain: e.target.value})} /></div>
+                    <div className="form-group"><label className="form-label">Highlight Title</label><input type="text" className="form-input" value={pageData.specTitleHighlight || ''} onChange={e => setPageData({...pageData, specTitleHighlight: e.target.value})} /></div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {(pageData.specialties || []).map((spec, i) => (
+                        <div key={i} className="p-4 bg-gray-50 border rounded-lg relative">
+                            <button type="button" onClick={() => removeArrayItem('specialties', i)} className="absolute top-2 right-2 text-red-500 font-bold text-lg">×</button>
+                            <input type="text" className="form-input mb-2" placeholder="Icon (e.g. 🎯)" value={spec.icon || ''} onChange={e => handleArrayChange('specialties', i, 'icon', e.target.value)} />
+                            <input type="text" className="form-input mb-2" placeholder="Title" value={spec.title || ''} onChange={e => handleArrayChange('specialties', i, 'title', e.target.value)} />
+                            <textarea className="form-input" placeholder="Description" value={spec.desc || ''} onChange={e => handleArrayChange('specialties', i, 'desc', e.target.value)} />
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* ── SECTION 3: TRENDING HIGHLIGHTS ── */}
+            <div className="form-section">
+                <div className="section-header" style={{justifyContent:'space-between'}}>
+                    <h3>Trending Highlights</h3>
+                    <button onClick={() => addArrayItem('trending', {title:'', desc:'', tags:''})} className="btn-add" style={{margin:0}}>+ Add Trending</button>
+                </div>
+                <div className="form-grid-2 mb-4">
+                    <div className="form-group"><label className="form-label">Main Title</label><input type="text" className="form-input" value={pageData.trendingTitleMain || ''} onChange={e => setPageData({...pageData, trendingTitleMain: e.target.value})} /></div>
+                    <div className="form-group"><label className="form-label">Highlight Title</label><input type="text" className="form-input" value={pageData.trendingTitleHighlight || ''} onChange={e => setPageData({...pageData, trendingTitleHighlight: e.target.value})} /></div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {(pageData.trending || []).map((item, i) => (
+                        <div key={i} className="p-4 bg-gray-50 border rounded-lg relative">
+                            <button type="button" onClick={() => removeArrayItem('trending', i)} className="absolute top-2 right-2 text-red-500 font-bold text-lg">×</button>
+                            <input type="text" className="form-input mb-2 font-bold" placeholder="Title" value={item.title || ''} onChange={e => handleArrayChange('trending', i, 'title', e.target.value)} />
+                            <textarea className="form-input mb-2" placeholder="Description" value={item.desc || ''} onChange={e => handleArrayChange('trending', i, 'desc', e.target.value)} />
+                            <input type="text" className="form-input text-xs" placeholder="Tags (e.g. 🔥 Trending)" value={item.tags || ''} onChange={e => handleArrayChange('trending', i, 'tags', e.target.value)} />
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* ── SECTION 4: IMPACT COUNTERS ── */}
+            <div className="form-section">
+                <div className="section-header" style={{justifyContent:'space-between'}}>
+                    <h3>Impact Counters</h3>
+                    <button onClick={() => addArrayItem('impactStats', {number:'', label1:'', label2:''})} className="btn-add" style={{margin:0}}>+ Add Counter</button>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {(pageData.impactStats || []).map((s, i) => (
+                        <div key={i} className="p-4 bg-white border rounded shadow-sm text-center">
+                            <input type="text" className="form-input mb-2 font-bold text-center" placeholder="500M+" value={s.number || ''} onChange={e => handleArrayChange('impactStats', i, 'number', e.target.value)} />
+                            <input type="text" className="form-input mb-1 text-xs" placeholder="Top Label" value={s.label1 || ''} onChange={e => handleArrayChange('impactStats', i, 'label1', e.target.value)} />
+                            <input type="text" className="form-input text-xs" placeholder="Bottom Label" value={s.label2 || ''} onChange={e => handleArrayChange('impactStats', i, 'label2', e.target.value)} />
+                            <button type="button" onClick={() => removeArrayItem('impactStats', i)} className="text-red-500 text-[10px] mt-2 underline w-full">Remove</button>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* ── SECTION 5: CTA SETTINGS ── */}
+            <div className="form-section">
+                <div className="section-header"><h3>Ready to Start (CTA)</h3></div>
+                <div className="form-grid-2">
+                    <div className="form-group"><label className="form-label">CTA Title</label><input type="text" className="form-input" value={pageData.ctaTitleMain || ''} onChange={e => setPageData({...pageData, ctaTitleMain: e.target.value})} /></div>
+                    <div className="form-group"><label className="form-label">CTA Highlight</label><input type="text" className="form-input" value={pageData.ctaTitleHighlight || ''} onChange={e => setPageData({...pageData, ctaTitleHighlight: e.target.value})} /></div>
+                </div>
+                <div className="form-group"><label className="form-label">CTA Description</label><textarea className="form-input" value={pageData.ctaDesc || ''} onChange={e => setPageData({...pageData, ctaDesc: e.target.value})} /></div>
+            </div>
+
+            {/* 🔥 GLOBAL SAVE BUTTON FOR ALL PAGE SETTINGS 🔥 */}
+            <div className="mt-8 sticky bottom-4 z-50">
+                <button onClick={handlePageDataSave} disabled={submitting} className="w-full bg-[#1a1a1a] text-white p-5 rounded-lg text-xl font-bold uppercase tracking-widest shadow-[0_10px_30px_rgba(0,0,0,0.3)] hover:bg-[#b5862a] transition-all duration-300">
+                    {submitting ? 'SAVING...' : '💾 SAVE PAGE SETTINGS'}
+                </button>
+            </div>
+            
         </div>
     );
 };

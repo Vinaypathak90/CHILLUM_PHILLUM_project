@@ -368,63 +368,218 @@ const ManageProjects = () => {
                 </div>
             </div>
 
-            {/* ── SECTION 3: CASE STUDIES ── */}
-            <div className="form-section">
-                <div className="section-header" style={{justifyContent:'space-between'}}>
-                    <h3>Case Studies & Headings</h3>
-                    <button onClick={() => addArrayItem('caseStudies', {title:'', desc:'', type:''})} className="btn-add" style={{margin:0}}>+ Add Case Study</button>
-                </div>
-                <div className="form-grid-2 mb-4">
-                    <div className="form-group"><label className="form-label">Main Title</label><input type="text" className="form-input" value={pageData.caseStudiesTitleMain || ''} onChange={e => setPageData({...pageData, caseStudiesTitleMain: e.target.value})} /></div>
-                    <div className="form-group"><label className="form-label">Highlight Title</label><input type="text" className="form-input" value={pageData.caseStudiesTitleHighlight || ''} onChange={e => setPageData({...pageData, caseStudiesTitleHighlight: e.target.value})} /></div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {(pageData.caseStudies || []).map((cs, i) => (
-                        <div key={i} className="p-4 bg-gray-50 border rounded-lg relative">
-                            <button type="button" onClick={() => removeArrayItem('caseStudies', i)} className="absolute top-2 right-2 text-red-500 font-bold text-lg">×</button>
-                            <input type="text" className="form-input mb-2" placeholder="Title" value={cs.title || ''} onChange={e => handleArrayChange('caseStudies', i, 'title', e.target.value)} />
-                            <textarea className="form-input mb-2" placeholder="Description" value={cs.desc || ''} onChange={e => handleArrayChange('caseStudies', i, 'desc', e.target.value)} />
-                            <input type="text" className="form-input" placeholder="Type" value={cs.type || ''} onChange={e => handleArrayChange('caseStudies', i, 'type', e.target.value)} />
-                        </div>
-                    ))}
+         {/* ========================================================================
+    ── SECTION 3: CASE STUDIES (RE-DESIGNED) ──
+======================================================================== */}
+<div className="form-section bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-10 transition-all hover:shadow-md">
+    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-4 border-b border-gray-50">
+        <div>
+            <h3 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                <span className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">📂</span>
+                Case Studies & Headings
+            </h3>
+            <p className="text-gray-500 text-sm mt-1">Manage deep-dive articles and section titles.</p>
+        </div>
+        <button 
+            type="button"
+            onClick={() => addArrayItem('caseStudies', {title:'', desc:'', type:''})} 
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-indigo-100 active:scale-95"
+        >
+            <span className="text-lg">+</span> Add Case Study
+        </button>
+    </div>
+
+    {/* Section Titles Edit */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 p-6 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+        <div className="form-group">
+            <label className="text-sm font-bold text-gray-700 mb-2 block uppercase tracking-wider">Main Title</label>
+            <input 
+                type="text" 
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white"
+                placeholder="Deep Dive into Our"
+                value={pageData.caseStudiesTitleMain || ''} 
+                onChange={e => setPageData({...pageData, caseStudiesTitleMain: e.target.value})} 
+            />
+        </div>
+        <div className="form-group">
+            <label className="text-sm font-bold text-gray-700 mb-2 block uppercase tracking-wider">Highlight Title (Gold)</label>
+            <input 
+                type="text" 
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all bg-white font-serif italic text-amber-600"
+                placeholder="Best Work"
+                value={pageData.caseStudiesTitleHighlight || ''} 
+                onChange={e => setPageData({...pageData, caseStudiesTitleHighlight: e.target.value})} 
+            />
+        </div>
+    </div>
+
+    {/* Case Studies Grid */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {(pageData.caseStudies || []).map((cs, i) => (
+            <div key={i} className="group relative p-6 bg-white border border-gray-100 rounded-2xl shadow-sm hover:border-indigo-200 transition-all hover:shadow-xl hover:shadow-gray-100">
+                <button 
+                    type="button" 
+                    onClick={() => removeArrayItem('caseStudies', i)} 
+                    className="absolute -top-3 -right-3 w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm z-10"
+                >
+                    ×
+                </button>
+                
+                <div className="space-y-4">
+                    <div>
+                        <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block">Project Title</label>
+                        <input 
+                            type="text" 
+                            className="w-full px-3 py-2 rounded-lg border border-gray-100 focus:bg-indigo-50/30 transition-colors font-bold text-gray-700" 
+                            placeholder="e.g. The Brand Revolution" 
+                            value={cs.title || ''} 
+                            onChange={e => handleArrayChange('caseStudies', i, 'title', e.target.value)} 
+                        />
+                    </div>
+                    <div>
+                        <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block">Description</label>
+                        <textarea 
+                            className="w-full px-3 py-2 rounded-lg border border-gray-100 focus:bg-indigo-50/30 transition-colors text-sm text-gray-600 min-h-[100px]" 
+                            placeholder="Describe the case study details..." 
+                            value={cs.desc || ''} 
+                            onChange={e => handleArrayChange('caseStudies', i, 'desc', e.target.value)} 
+                        />
+                    </div>
+                    <div>
+                        <label className="text-[10px] font-black text-gray-400 uppercase mb-1 block">Campaign Category</label>
+                        <input 
+                            type="text" 
+                            className="w-full px-3 py-2 rounded-lg border border-gray-100 focus:bg-indigo-50/30 transition-colors text-xs font-semibold text-indigo-600" 
+                            placeholder="e.g. Advertising" 
+                            value={cs.type || ''} 
+                            onChange={e => handleArrayChange('caseStudies', i, 'type', e.target.value)} 
+                        />
+                    </div>
                 </div>
             </div>
+        ))}
+        {pageData.caseStudies?.length === 0 && (
+            <div className="col-span-full py-12 text-center border-2 border-dashed border-gray-100 rounded-2xl text-gray-400">
+                No case studies added yet. Click the button above to start.
+            </div>
+        )}
+    </div>
+</div>
 
-            {/* ── SECTION 4: IMPACT COUNTERS ── */}
-            <div className="form-section">
-                <div className="section-header" style={{justifyContent:'space-between'}}>
-                    <h3>Impact Counters</h3>
-                    <button onClick={() => addArrayItem('stats', {number:'', label1:'', label2:''})} className="btn-add" style={{margin:0}}>+ Add Counter</button>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {(pageData.stats || []).map((s, i) => (
-                        <div key={i} className="p-4 bg-white border rounded shadow-sm text-center">
-                            <input type="text" className="form-input mb-2 font-bold text-center" placeholder="500M+" value={s.number || ''} onChange={e => handleArrayChange('stats', i, 'number', e.target.value)} />
-                            <input type="text" className="form-input mb-1 text-xs" placeholder="Views" value={s.label1 || ''} onChange={e => handleArrayChange('stats', i, 'label1', e.target.value)} />
-                            <input type="text" className="form-input text-xs" placeholder="Generated" value={s.label2 || ''} onChange={e => handleArrayChange('stats', i, 'label2', e.target.value)} />
-                            <button type="button" onClick={() => removeArrayItem('stats', i)} className="text-red-500 text-[10px] mt-2 underline">Remove</button>
-                        </div>
-                    ))}
+{/* ========================================================================
+    ── SECTION 4: IMPACT COUNTERS (RE-DESIGNED) ──
+======================================================================== */}
+<div className="form-section bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-10 transition-all hover:shadow-md">
+    <div className="flex justify-between items-center mb-8">
+        <h3 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <span className="p-2 bg-amber-50 text-amber-600 rounded-lg">📊</span>
+            Impact Counters
+        </h3>
+        <button 
+            type="button"
+            onClick={() => addArrayItem('stats', {number:'', label1:'', label2:''})} 
+            className="flex items-center gap-2 text-amber-600 hover:text-amber-700 font-bold px-4 py-2 rounded-lg bg-amber-50 hover:bg-amber-100 transition-all"
+        >
+            + Add Metric
+        </button>
+    </div>
+
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {(pageData.stats || []).map((s, i) => (
+            <div key={i} className="relative p-6 bg-gradient-to-b from-gray-50 to-white border border-gray-100 rounded-2xl shadow-sm text-center group">
+                <button 
+                    type="button" 
+                    onClick={() => removeArrayItem('stats', i)} 
+                    className="absolute top-2 right-2 text-gray-300 hover:text-red-500 transition-colors p-1"
+                >
+                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeLinecap="round" strokeLinejoin="round"></path></svg>
+                </button>
+
+                <div className="space-y-3 pt-2">
+                    <input 
+                        type="text" 
+                        className="w-full bg-transparent text-center text-3xl font-black text-amber-600 placeholder-gray-300 focus:outline-none" 
+                        placeholder="500M+" 
+                        value={s.number || ''} 
+                        onChange={e => handleArrayChange('stats', i, 'number', e.target.value)} 
+                    />
+                    <div className="space-y-1">
+                        <input 
+                            type="text" 
+                            className="w-full bg-transparent text-center text-[10px] font-black uppercase tracking-tighter text-gray-800 focus:outline-none border-b border-transparent focus:border-amber-200" 
+                            placeholder="PRIMARY LABEL" 
+                            value={s.label1 || ''} 
+                            onChange={e => handleArrayChange('stats', i, 'label1', e.target.value)} 
+                        />
+                        <input 
+                            type="text" 
+                            className="w-full bg-transparent text-center text-[10px] font-medium text-gray-400 focus:outline-none border-b border-transparent focus:border-amber-200" 
+                            placeholder="secondary label" 
+                            value={s.label2 || ''} 
+                            onChange={e => handleArrayChange('stats', i, 'label2', e.target.value)} 
+                        />
+                    </div>
                 </div>
             </div>
+        ))}
+    </div>
+</div>
 
-            {/* ── SECTION 5: CTA SETTINGS ── */}
-            <div className="form-section">
-                <div className="section-header"><h3>Ready to Start (CTA)</h3></div>
-                <div className="form-grid-2">
-                    <div className="form-group"><label className="form-label">CTA Title</label><input type="text" className="form-input" value={pageData.ctaTitleMain || ''} onChange={e => setPageData({...pageData, ctaTitleMain: e.target.value})} /></div>
-                    <div className="form-group"><label className="form-label">CTA Highlight</label><input type="text" className="form-input" value={pageData.ctaTitleHighlight || ''} onChange={e => setPageData({...pageData, ctaTitleHighlight: e.target.value})} /></div>
-                </div>
-                <div className="form-group"><label className="form-label">CTA Description</label><textarea className="form-input" value={pageData.ctaDesc || ''} onChange={e => setPageData({...pageData, ctaDesc: e.target.value})} /></div>
+{/* ========================================================================
+    ── SECTION 5: CTA SETTINGS (RE-DESIGNED) ──
+======================================================================== */}
+<div className="form-section bg-gradient-to-br from-[#1a1a1a] to-[#2d2d2d] rounded-2xl shadow-xl p-8 mb-20 text-white border border-gray-800">
+    <div className="flex items-center gap-3 mb-8">
+        <span className="p-2 bg-white/10 text-amber-400 rounded-lg">🚀</span>
+        <h3 className="text-2xl font-bold">Ready to Start (CTA) Section</h3>
+    </div>
+    
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="space-y-6">
+            <div className="form-group">
+                <label className="text-xs font-bold text-gray-400 mb-2 block uppercase tracking-widest">Main CTA Title</label>
+                <input 
+                    type="text" 
+                    className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 focus:bg-white/10 transition-all outline-none text-lg text-white"
+                    placeholder="Ready to Bring Your"
+                    value={pageData.ctaTitleMain || ''} 
+                    onChange={e => setPageData({...pageData, ctaTitleMain: e.target.value})} 
+                />
             </div>
+            <div className="form-group">
+                <label className="text-xs font-bold text-amber-400/60 mb-2 block uppercase tracking-widest">Highlight Title (Gold)</label>
+                <input 
+                    type="text" 
+                    className="w-full px-4 py-3 rounded-xl border border-amber-500/20 bg-amber-500/5 focus:bg-amber-500/10 transition-all outline-none text-lg text-amber-400 font-serif italic"
+                    placeholder="Vision to Life?"
+                    value={pageData.ctaTitleHighlight || ''} 
+                    onChange={e => setPageData({...pageData, ctaTitleHighlight: e.target.value})} 
+                />
+            </div>
+        </div>
+        <div className="form-group">
+            <label className="text-xs font-bold text-gray-400 mb-2 block uppercase tracking-widest">CTA Description</label>
+            <textarea 
+                className="w-full h-full min-h-[160px] px-4 py-3 rounded-xl border border-white/10 bg-white/5 focus:bg-white/10 transition-all outline-none text-gray-300 text-sm leading-relaxed"
+                placeholder="Let's discuss your next project..."
+                value={pageData.ctaDesc || ''} 
+                onChange={e => setPageData({...pageData, ctaDesc: e.target.value})} 
+            />
+        </div>
+    </div>
+</div>
 
-            {/* MASTER SAVE FOR ALL PAGE SETTINGS */}
-            <div className="mt-8 sticky bottom-4 z-50">
+{/* ========================================================================
+    ── STICKY MASTER SAVE BAR (RE-DESIGNED) ──
+======================================================================== */}
+<div className="mt-8 sticky bottom-4 z-50">
                 <button onClick={handlePageDataSave} className="w-full bg-[#1a1a1a] text-white p-5 rounded-lg text-xl font-bold uppercase tracking-widest shadow-2xl hover:bg-[#b5862a] transition-all duration-300">
                     {submitting ? 'SAVING...' : '💾 SAVE PAGE SETTINGS'}
                 </button>
             </div>
         </div>
+            
+        
     );
 };
 

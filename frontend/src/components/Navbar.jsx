@@ -38,7 +38,7 @@ const Navbar = ({ navData }) => {
           <li><a href="/studio">The Studio</a></li>
           <li><a href="/team">Our Team</a></li>
           <li><a href="/projects">Our Projects</a></li>
-          <li><a href="/news">Our Campaigns</a></li>
+          <li><a href="/campaigns">Our Campaigns</a></li>
           <li><a href="/contact">Contact</a></li>
         </ul>
 
@@ -57,7 +57,7 @@ const Navbar = ({ navData }) => {
           <li><a href="/studio" onClick={handleLinkClick}>The Studio</a></li>
           <li><a href="/team" onClick={handleLinkClick}>Our Team</a></li>
           <li><a href="/projects" onClick={handleLinkClick}>Our Projects</a></li>
-          <li><a href="/news" onClick={handleLinkClick}>Our Campaigns</a></li>
+          <li><a href="/campaigns" onClick={handleLinkClick}>Our Campaigns</a></li>
           <li><a href="/contact" onClick={handleLinkClick}>Contact</a></li>
         </ul>
       </div>

@@ -184,7 +184,28 @@ projectsPage: {
     ctaDesc: { type: String },
     ctaButtonText: { type: String, default: 'Start Your Project' },
     ctaButtonLink: { type: String, default: '/contact' }
-},
+},// 🔥 CAMPAIGNS PAGE DATA 🔥
+    campaignsPage: {
+        // ── RECENT HIGHLIGHTS / TRENDING ──
+        trendingLabel: { type: String, default: 'Recent Highlights' },
+        trendingTitleMain: { type: String, default: 'Trending' },
+        trendingTitleHighlight: { type: String, default: 'Right Now' },
+        trending: [{
+            title: { type: String },
+            desc: { type: String },
+            tags: { type: String } // e.g., "🔥 Trending • 10M+ Views • 2025"
+        }],
+
+        // ── MEASURABLE RESULTS / IMPACT STATS ──
+        impactLabel: { type: String, default: 'Measurable Results' },
+        impactTitleMain: { type: String, default: 'Campaigns That' },
+        impactTitleHighlight: { type: String, default: 'Deliver Real Impact' },
+        impactStats: [{
+            number: { type: String }, // e.g., "350%" (Counter will extract the number)
+            label1: { type: String }, // e.g., "Avg. Engagement"
+            label2: { type: String }  // e.g., "Increase"
+        }]
+    },
   // ── 6. FOOTER ──
   footer: {
     copyrightText: { type: String, default: '© 2026 Chillum Phillum. All rights reserved.' },
