@@ -5,7 +5,16 @@ import './ManageProjects.css';
 import config from "../../config";// Centralized config for API base URL
 
 const ManageTeam = () => {
-    const [team, setTeam] = useState([]);
+   const [team, setTeam] = useState([]);
+   const [teamData, setTeamData] = useState({
+        label: '', titleMain: '', titleHighlight: '', 
+        members: [], 
+        cultureLabel: '', cultureTitleMain: '', cultureTitleHighlight: '', cultureDesc: '', 
+        cultureCards: [], 
+        testimonialsLabel: '', testimonialsTitleMain: '', testimonialsTitleHighlight: '', 
+        testimonials: [],
+        careerLabel: '', careerTitleMain: '', careerTitleHighlight: '', careerDesc: '', careerButtonText: '', careerButtonLink: ''
+    });
     const [loading, setLoading] = useState(true);
     
     // Form and Status states
@@ -41,9 +50,37 @@ const ManageTeam = () => {
         fetchTeam();
     }, []);
 
-    // Handle Form Input changes
+    // Handle Form Input changes for member form
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    // Handle TeamData form changes (for culture, testimonials, etc.)
+    const handleTeamDataChange = (e) => {
+        setTeamData({ ...teamData, [e.target.name]: e.target.value });
+    };
+
+    // Add item to array fields
+    const addArrayItem = (field, newItem) => {
+        setTeamData({
+            ...teamData,
+            [field]: [...(teamData[field] || []), newItem]
+        });
+    };
+
+    // Remove item from array fields
+    const removeArrayItem = (field, index) => {
+        setTeamData({
+            ...teamData,
+            [field]: teamData[field].filter((_, i) => i !== index)
+        });
+    };
+
+    // Update nested array item properties
+    const handleArrayChange = (field, index, key, value) => {
+        const updatedArray = [...teamData[field]];
+        updatedArray[index] = { ...updatedArray[index], [key]: value };
+        setTeamData({ ...teamData, [field]: updatedArray });
     };
 
     // 🚀 NEW: Handle Image Upload (Cloudinary)
@@ -134,6 +171,44 @@ const ManageTeam = () => {
             } catch (err) {
                 alert('Failed to delete team member.');
             }
+        }
+    };
+
+    // Save Team Data (Culture, Testimonials, Career)
+    const handleSaveTeamData = async (e) => {
+        if (e) e.preventDefault();
+        setSubmitting(true);
+        
+        try {
+            // Prepare data to save
+            const dataToSave = {
+                team: {
+                    cultureLabel: teamData.cultureLabel,
+                    cultureTitleMain: teamData.cultureTitleMain,
+                    cultureTitleHighlight: teamData.cultureTitleHighlight,
+                    cultureDesc: teamData.cultureDesc,
+                    cultureCards: teamData.cultureCards,
+                    testimonialsLabel: teamData.testimonialsLabel,
+                    testimonialsTitleMain: teamData.testimonialsTitleMain,
+                    testimonialsTitleHighlight: teamData.testimonialsTitleHighlight,
+                    testimonials: teamData.testimonials,
+                    careerLabel: teamData.careerLabel,
+                    careerTitleMain: teamData.careerTitleMain,
+                    careerTitleHighlight: teamData.careerTitleHighlight,
+                    careerDesc: teamData.careerDesc,
+                    careerButtonText: teamData.careerButtonText,
+                    careerButtonLink: teamData.careerButtonLink
+                }
+            };
+
+            // Save to backend via page-content endpoint
+            await axios.post(`${config.API_BASE_URL}/page-content`, dataToSave);
+            setMessage({ text: '✅ Team page content saved successfully!', type: 'success' });
+            setTimeout(() => setMessage({ text: '', type: '' }), 3000);
+        } catch (err) {
+            setMessage({ text: '❌ Failed to save team content: ' + (err.response?.data?.message || err.message), type: 'error' });
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -269,6 +344,93 @@ const ManageTeam = () => {
                     )}
                 </div>
             </div>
+            {/* ==========================================
+                    2. STUDIO CULTURE SECTION
+                ========================================== */}
+                <form onSubmit={handleSaveTeamData}>
+                <div className="form-section">
+                    <div className="section-header"><h3>2. Studio Culture Section</h3></div>
+                    <div className="form-grid-2 mb-4">
+                        <div className="form-group"><label className="form-label">Section Label</label><input type="text" name="cultureLabel" className="form-input" value={teamData.cultureLabel || ''} onChange={handleTeamDataChange} /></div>
+                        <div className="form-group"><label className="form-label">Main Title</label><input type="text" name="cultureTitleMain" className="form-input" value={teamData.cultureTitleMain || ''} onChange={handleTeamDataChange} /></div>
+                        <div className="form-group"><label className="form-label">Highlight Title</label><input type="text" name="cultureTitleHighlight" className="form-input" value={teamData.cultureTitleHighlight || ''} onChange={handleTeamDataChange} /></div>
+                    </div>
+                    <div className="form-group"><label className="form-label">Description Paragraph</label><textarea name="cultureDesc" className="form-input" rows="2" value={teamData.cultureDesc || ''} onChange={handleTeamDataChange}></textarea></div>
+
+                    <div className="form-group p-4 bg-gray-50 rounded border">
+                        <div className="flex justify-between items-center mb-4">
+                            <label className="form-label mb-0">Culture Cards</label>
+                            <button type="button" onClick={() => addArrayItem('cultureCards', { icon: '', title: '', desc: '' })} className="bg-[#b5862a] text-white px-4 py-2 rounded text-sm font-bold">+ Add Card</button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {(teamData.cultureCards || []).map((card, i) => (
+                                <div key={i} className="p-3 bg-white border rounded relative">
+                                    <button type="button" onClick={() => removeArrayItem('cultureCards', i)} className="absolute top-2 right-2 text-red-500">🗑️</button>
+                                    <div className="flex gap-2 mb-2 pr-6">
+                                        <input type="text" className="w-1/4 border p-2 rounded text-sm" placeholder="Icon (🎨)" value={card.icon || ''} onChange={(e) => handleArrayChange('cultureCards', i, 'icon', e.target.value)} />
+                                        <input type="text" className="w-3/4 border p-2 rounded text-sm" placeholder="Title" value={card.title || ''} onChange={(e) => handleArrayChange('cultureCards', i, 'title', e.target.value)} />
+                                    </div>
+                                    <textarea className="w-full border p-2 rounded text-sm" rows="3" placeholder="Description" value={card.desc || ''} onChange={(e) => handleArrayChange('cultureCards', i, 'desc', e.target.value)}></textarea>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+                {/* ==========================================
+                    3. TESTIMONIALS SECTION
+                ========================================== */}
+                <div className="form-section">
+                    <div className="section-header"><h3>3. Testimonials Section</h3></div>
+                    <div className="form-grid-2 mb-4">
+                        <div className="form-group"><label className="form-label">Section Label</label><input type="text" name="testimonialsLabel" className="form-input" value={teamData.testimonialsLabel || ''} onChange={handleTeamDataChange} /></div>
+                        <div className="form-group"><label className="form-label">Main Title</label><input type="text" name="testimonialsTitleMain" className="form-input" value={teamData.testimonialsTitleMain || ''} onChange={handleTeamDataChange} /></div>
+                        <div className="form-group"><label className="form-label">Highlight Title</label><input type="text" name="testimonialsTitleHighlight" className="form-input" value={teamData.testimonialsTitleHighlight || ''} onChange={handleTeamDataChange} /></div>
+                    </div>
+
+                    <div className="form-group p-4 bg-gray-50 rounded border">
+                        <div className="flex justify-between items-center mb-4">
+                            <label className="form-label mb-0">Testimonials List</label>
+                            <button type="button" onClick={() => addArrayItem('testimonials', { quote: '', name: '', role: '' })} className="bg-[#b5862a] text-white px-4 py-2 rounded text-sm font-bold">+ Add Testimonial</button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {(teamData.testimonials || []).map((test, i) => (
+                                <div key={i} className="p-3 bg-white border rounded relative">
+                                    <button type="button" onClick={() => removeArrayItem('testimonials', i)} className="absolute top-2 right-2 text-red-500">🗑️</button>
+                                    <textarea className="w-full border p-2 rounded text-sm mb-2 pr-6" rows="2" placeholder="Quote..." value={test.quote || ''} onChange={(e) => handleArrayChange('testimonials', i, 'quote', e.target.value)}></textarea>
+                                    <div className="flex gap-2">
+                                        <input type="text" className="w-1/2 border p-2 rounded text-sm" placeholder="Author Name" value={test.name || ''} onChange={(e) => handleArrayChange('testimonials', i, 'name', e.target.value)} />
+                                        <input type="text" className="w-1/2 border p-2 rounded text-sm" placeholder="Author Role" value={test.role || ''} onChange={(e) => handleArrayChange('testimonials', i, 'role', e.target.value)} />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* ==========================================
+                    4. CAREER / HIRING SECTION
+                ========================================== */}
+                <div className="form-section">
+                    <div className="section-header"><h3>4. Career / Hiring Section</h3></div>
+                    <div className="form-grid-2 mb-4">
+                        <div className="form-group"><label className="form-label">Section Label</label><input type="text" name="careerLabel" className="form-input" value={teamData.careerLabel || ''} onChange={handleTeamDataChange} /></div>
+                        <div className="form-group"><label className="form-label">Main Title</label><input type="text" name="careerTitleMain" className="form-input" value={teamData.careerTitleMain || ''} onChange={handleTeamDataChange} /></div>
+                        <div className="form-group"><label className="form-label">Highlight Title</label><input type="text" name="careerTitleHighlight" className="form-input" value={teamData.careerTitleHighlight || ''} onChange={handleTeamDataChange} /></div>
+                    </div>
+                    <div className="form-group"><label className="form-label">Description</label><textarea name="careerDesc" className="form-input" rows="2" value={teamData.careerDesc || ''} onChange={handleTeamDataChange}></textarea></div>
+                    <div className="form-grid-2">
+                        <div className="form-group"><label className="form-label">Button Text</label><input type="text" name="careerButtonText" className="form-input" value={teamData.careerButtonText || ''} onChange={handleTeamDataChange} /></div>
+                        <div className="form-group"><label className="form-label">Button Link</label><input type="text" name="careerButtonLink" className="form-input" value={teamData.careerButtonLink || ''} onChange={handleTeamDataChange} /></div>
+                    </div>
+
+                    {/* SAVE BUTTON */}
+                    <div className="form-actions" style={{justifyContent: 'flex-start', gap: '15px', marginTop: '30px', paddingTop: '20px', borderTop: '2px solid #e5e7eb'}}>
+                        <button type="submit" disabled={submitting} className="save-btn">
+                            {submitting ? '💾 SAVING...' : '💾 SAVE TEAM PAGE CONTENT'}
+                        </button>
+                    </div>
+                </div>
+                </form>
 
         </div>
     );
