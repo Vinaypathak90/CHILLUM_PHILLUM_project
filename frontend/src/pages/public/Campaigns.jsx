@@ -100,9 +100,9 @@ const Campaigns = () => {
   ];
 
   const defaultSpecialties = [
-    { title: '🎯 Advertising Campaigns', desc: 'High-impact brand campaigns that cut through the noise and create lasting impressions on your target audience.' },
-    { title: '🎬 Product Launches', desc: 'Comprehensive multimedia strategies to generate buzz and excitement around new product releases.' },
-    { title: '📱 Digital Campaigns', desc: 'Social media-optimized content, web series, and digital storytelling that engages modern audiences.' }
+    { icon: '🎯', title: 'Advertising Campaigns', desc: 'High-impact brand campaigns that cut through the noise and create lasting impressions on your target audience.' },
+    { icon: '🎬', title: 'Product Launches', desc: 'Comprehensive multimedia strategies to generate buzz and excitement around new product releases.' },
+    { icon: '📱', title: 'Digital Campaigns', desc: 'Social media-optimized content, web series, and digital storytelling that engages modern audiences.' }
   ];
 
   const defaultTrending = [
@@ -134,6 +134,31 @@ const Campaigns = () => {
       <CampaignsSection campaigns={updates} onCampaignClick={setActiveCampaign} />
     
      <ClientSliderSection clients={clients} loading={loadingClients} />
+{/* ── CAMPAIGN SPECIALTIES ── */}
+      <section className="bg-[#f5f1eb] py-28 px-6 md:px-12">
+        <span className="block text-[0.68rem] tracking-[0.35em] uppercase text-[#b5862a] mb-4">
+          {pageData.specLabel || 'Campaign Specialties'}
+        </span>
+        <h2 className="font-['Playfair_Display'] text-[clamp(2rem,4vw,3.2rem)] font-normal leading-[1.15]">
+          {pageData.specTitleMain || 'We Excel in'} <em className="italic text-[#b5862a]">{pageData.specTitleHighlight || 'Every Campaign Type'}</em>
+        </h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-8 mt-12">
+          {specialties.map((spec, i) => (
+            <div key={i} className="p-8 bg-white rounded-lg shadow-[0_4px_15px_rgba(0,0,0,0.05)]">
+              <div className="flex items-start gap-3 mb-4">
+                {spec.icon && <span className="text-2xl">{spec.icon}</span>}
+                <h3 className="text-[1.1rem] text-[#b5862a] font-bold">
+                  {spec.title}
+                </h3>
+              </div>
+              <p className="text-[#555] leading-[1.8] text-[0.95rem]">
+                {spec.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* ── RECENT HIGHLIGHTS / TRENDING ── */}
       <section className="bg-gradient-to-br from-[#f0ece4] to-[#e8e2d8] py-28 px-6 md:px-12">

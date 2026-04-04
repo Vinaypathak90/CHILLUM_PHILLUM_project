@@ -28,7 +28,7 @@ const ManageCampaigns = () => {
     };
     const [formData, setFormData] = useState(initialFormState);
 
-    // 🔥 NEW: Page Content State (Specialties, Trending, Counters, CTA)
+    // 🔥 NEW: Page Content State (Specialties, Trending, Counters)
     const [pageData, setPageData] = useState({
         specLabel: 'Campaign Specialties', specTitleMain: 'We Excel in', specTitleHighlight: 'Every Campaign Type',
         specialties: [],
@@ -36,7 +36,6 @@ const ManageCampaigns = () => {
         trending: [],
         impactLabel: 'Measurable Results', impactTitleMain: 'Campaigns That', impactTitleHighlight: 'Deliver Real Impact',
         impactStats: [],
-        ctaTitleMain: 'Ready to Bring Your', ctaTitleHighlight: 'Vision to Life?', ctaDesc: '', ctaButtonText: 'Start Your Project', ctaButtonLink: '/contact'
     });
 
     // Fetch all campaigns on mount
@@ -203,7 +202,7 @@ const ManageCampaigns = () => {
     if (loading) return <div className="loading-text" style={{padding: '20px', fontWeight: 'bold', color: '#6b7280'}}>Loading Campaigns Data...</div>;
 
     return (
-        <div className="manage-content-wrapper">
+        <div className="manage-content-wrapper pb-32">
             
             {/* Status Alert */}
             {message.text && (
@@ -218,7 +217,7 @@ const ManageCampaigns = () => {
                 </div>
             )}
 
-            {/* ── CAMPAIGN FORM ── */}
+            {/* ── CAMPAIGN FORM (UNTOUCHED) ── */}
             <div className="form-section">
                 <div className="section-header" style={{ justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -347,7 +346,7 @@ const ManageCampaigns = () => {
                 </form>
             </div>
 
-            {/* ── CAMPAIGNS GRID DISPLAY ── */}
+            {/* ── CAMPAIGNS GRID DISPLAY (UNTOUCHED) ── */}
             <div className="form-section" style={{marginTop: '40px', marginBottom: '60px'}}>
                 <div className="section-header">
                     <h3>News & Campaigns Library <span style={{ fontSize: '14px', color: '#6b7280', fontWeight: '400', marginLeft: '10px' }}>({campaigns.length} Total Articles)</span></h3>
@@ -388,88 +387,125 @@ const ManageCampaigns = () => {
                 </div>
             </div>
 
-            {/* 🔥 NEW FEATURES: PAGE CONTENT SETTINGS START HERE 🔥 */}
+            {/* =========================================================================
+                🔥 NEW FEATURES: PREMIUM UI FOR PAGE CONTENT SETTINGS 🔥
+            ========================================================================= */}
 
             {/* ── SECTION 2: CAMPAIGN SPECIALTIES ── */}
-            <div className="form-section">
-                <div className="section-header" style={{justifyContent:'space-between'}}>
-                    <h3>Campaign Specialties</h3>
-                    <button onClick={() => addArrayItem('specialties', {icon:'', title:'', desc:''})} className="btn-add" style={{margin:0}}>+ Add Specialty</button>
+            <div className="form-section bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-10 transition-all hover:shadow-md">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-4 border-b border-gray-50">
+                    <div>
+                        <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                            <span className="p-2 bg-emerald-50 text-emerald-600 rounded-lg">🎯</span>
+                            Campaign Specialties
+                        </h3>
+                    </div>
+                    <button type="button" onClick={() => addArrayItem('specialties', {icon:'', title:'', desc:''})} className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-emerald-100 active:scale-95" style={{margin: 0}}>
+                        + Add Specialty
+                    </button>
                 </div>
-                <div className="form-grid-2 mb-4">
-                    <div className="form-group"><label className="form-label">Main Title</label><input type="text" className="form-input" value={pageData.specTitleMain || ''} onChange={e => setPageData({...pageData, specTitleMain: e.target.value})} /></div>
-                    <div className="form-group"><label className="form-label">Highlight Title</label><input type="text" className="form-input" value={pageData.specTitleHighlight || ''} onChange={e => setPageData({...pageData, specTitleHighlight: e.target.value})} /></div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 p-6 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+                    <div className="form-group mb-0">
+                        <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">Main Title</label>
+                        <input type="text" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none transition-all" value={pageData.specTitleMain || ''} onChange={e => setPageData({...pageData, specTitleMain: e.target.value})} placeholder="We Excel in" />
+                    </div>
+                    <div className="form-group mb-0">
+                        <label className="text-xs font-bold text-amber-500 uppercase mb-2 block">Highlight Title</label>
+                        <input type="text" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-amber-500 outline-none transition-all text-amber-600 font-serif italic" value={pageData.specTitleHighlight || ''} onChange={e => setPageData({...pageData, specTitleHighlight: e.target.value})} placeholder="Every Campaign Type" />
+                    </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {(pageData.specialties || []).map((spec, i) => (
-                        <div key={i} className="p-4 bg-gray-50 border rounded-lg relative">
-                            <button type="button" onClick={() => removeArrayItem('specialties', i)} className="absolute top-2 right-2 text-red-500 font-bold text-lg">×</button>
-                            <input type="text" className="form-input mb-2" placeholder="Icon (e.g. 🎯)" value={spec.icon || ''} onChange={e => handleArrayChange('specialties', i, 'icon', e.target.value)} />
-                            <input type="text" className="form-input mb-2" placeholder="Title" value={spec.title || ''} onChange={e => handleArrayChange('specialties', i, 'title', e.target.value)} />
-                            <textarea className="form-input" placeholder="Description" value={spec.desc || ''} onChange={e => handleArrayChange('specialties', i, 'desc', e.target.value)} />
+                        <div key={i} className="relative p-6 bg-white border border-gray-100 rounded-2xl shadow-sm hover:border-emerald-200 transition-all group">
+                            <button type="button" onClick={() => removeArrayItem('specialties', i)} className="absolute -top-3 -right-3 w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm z-10 font-bold">×</button>
+                            <input type="text" className="w-full mb-3 px-4 py-2 text-sm rounded-lg border border-gray-100 focus:bg-emerald-50/30 outline-none transition-colors" placeholder="Icon (e.g. 🎯)" value={spec.icon || ''} onChange={e => handleArrayChange('specialties', i, 'icon', e.target.value)} />
+                            <input type="text" className="w-full mb-3 px-4 py-2 text-sm rounded-lg border border-gray-100 focus:bg-emerald-50/30 outline-none transition-colors font-bold text-gray-700" placeholder="Specialty Title" value={spec.title || ''} onChange={e => handleArrayChange('specialties', i, 'title', e.target.value)} />
+                            <textarea className="w-full px-4 py-3 text-sm rounded-lg border border-gray-100 focus:bg-emerald-50/30 outline-none transition-colors text-gray-600 min-h-[100px]" placeholder="Specialty Description..." value={spec.desc || ''} onChange={e => handleArrayChange('specialties', i, 'desc', e.target.value)}></textarea>
                         </div>
                     ))}
+                    {pageData.specialties?.length === 0 && <div className="col-span-full py-8 text-center text-gray-400 border-2 border-dashed border-gray-100 rounded-2xl">No specialties added yet.</div>}
                 </div>
             </div>
 
             {/* ── SECTION 3: TRENDING HIGHLIGHTS ── */}
-            <div className="form-section">
-                <div className="section-header" style={{justifyContent:'space-between'}}>
-                    <h3>Trending Highlights</h3>
-                    <button onClick={() => addArrayItem('trending', {title:'', desc:'', tags:''})} className="btn-add" style={{margin:0}}>+ Add Trending</button>
+            <div className="form-section bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-10 transition-all hover:shadow-md">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-4 border-b border-gray-50">
+                    <div>
+                        <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                            <span className="p-2 bg-purple-50 text-purple-600 rounded-lg">🔥</span>
+                            Trending Highlights
+                        </h3>
+                    </div>
+                    <button type="button" onClick={() => addArrayItem('trending', {title:'', desc:'', tags:''})} className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-purple-100 active:scale-95" style={{margin: 0}}>
+                        + Add Trending Card
+                    </button>
                 </div>
-                <div className="form-grid-2 mb-4">
-                    <div className="form-group"><label className="form-label">Main Title</label><input type="text" className="form-input" value={pageData.trendingTitleMain || ''} onChange={e => setPageData({...pageData, trendingTitleMain: e.target.value})} /></div>
-                    <div className="form-group"><label className="form-label">Highlight Title</label><input type="text" className="form-input" value={pageData.trendingTitleHighlight || ''} onChange={e => setPageData({...pageData, trendingTitleHighlight: e.target.value})} /></div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 p-6 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+                    <div className="form-group mb-0">
+                        <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">Main Title</label>
+                        <input type="text" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all" value={pageData.trendingTitleMain || ''} onChange={e => setPageData({...pageData, trendingTitleMain: e.target.value})} placeholder="Trending" />
+                    </div>
+                    <div className="form-group mb-0">
+                        <label className="text-xs font-bold text-amber-500 uppercase mb-2 block">Highlight Title</label>
+                        <input type="text" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-amber-500 outline-none transition-all text-amber-600 font-serif italic" value={pageData.trendingTitleHighlight || ''} onChange={e => setPageData({...pageData, trendingTitleHighlight: e.target.value})} placeholder="Right Now" />
+                    </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {(pageData.trending || []).map((item, i) => (
-                        <div key={i} className="p-4 bg-gray-50 border rounded-lg relative">
-                            <button type="button" onClick={() => removeArrayItem('trending', i)} className="absolute top-2 right-2 text-red-500 font-bold text-lg">×</button>
-                            <input type="text" className="form-input mb-2 font-bold" placeholder="Title" value={item.title || ''} onChange={e => handleArrayChange('trending', i, 'title', e.target.value)} />
-                            <textarea className="form-input mb-2" placeholder="Description" value={item.desc || ''} onChange={e => handleArrayChange('trending', i, 'desc', e.target.value)} />
-                            <input type="text" className="form-input text-xs" placeholder="Tags (e.g. 🔥 Trending)" value={item.tags || ''} onChange={e => handleArrayChange('trending', i, 'tags', e.target.value)} />
+                        <div key={i} className="relative p-6 bg-white border border-gray-100 rounded-2xl shadow-sm hover:border-purple-200 transition-all group">
+                            <button type="button" onClick={() => removeArrayItem('trending', i)} className="absolute -top-3 -right-3 w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm z-10 font-bold">×</button>
+                            <input type="text" className="w-full mb-3 px-4 py-2 text-sm rounded-lg border border-gray-100 focus:bg-purple-50/30 outline-none transition-colors font-bold text-gray-800" placeholder="Campaign Title" value={item.title || ''} onChange={e => handleArrayChange('trending', i, 'title', e.target.value)} />
+                            <textarea className="w-full mb-3 px-4 py-3 text-sm rounded-lg border border-gray-100 focus:bg-purple-50/30 outline-none transition-colors text-gray-600 min-h-[100px]" placeholder="Description..." value={item.desc || ''} onChange={e => handleArrayChange('trending', i, 'desc', e.target.value)}></textarea>
+                            <input type="text" className="w-full px-4 py-2 text-xs font-bold text-amber-600 uppercase rounded-lg border border-gray-100 focus:bg-purple-50/30 outline-none transition-colors tracking-wide" placeholder="Tags (e.g. 🔥 Trending • 10M+ Views)" value={item.tags || ''} onChange={e => handleArrayChange('trending', i, 'tags', e.target.value)} />
                         </div>
                     ))}
+                    {pageData.trending?.length === 0 && <div className="col-span-full py-8 text-center text-gray-400 border-2 border-dashed border-gray-100 rounded-2xl">No trending cards added yet.</div>}
                 </div>
             </div>
 
-            {/* ── SECTION 4: IMPACT COUNTERS ── */}
-            <div className="form-section">
-                <div className="section-header" style={{justifyContent:'space-between'}}>
-                    <h3>Impact Counters</h3>
-                    <button onClick={() => addArrayItem('impactStats', {number:'', label1:'', label2:''})} className="btn-add" style={{margin:0}}>+ Add Counter</button>
+            {/* ── SECTION 4: IMPACT COUNTERS (ANIMATED) ── */}
+            <div className="form-section bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-10 transition-all hover:shadow-md">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-4 border-b border-gray-50">
+                    <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                        <span className="p-2 bg-amber-50 text-amber-600 rounded-lg">📈</span>
+                        Impact Counters (Animated)
+                    </h3>
+                    <button type="button" onClick={() => addArrayItem('impactStats', {number:'', label1:'', label2:''})} className="flex items-center gap-2 text-amber-700 bg-amber-100 hover:bg-amber-200 px-5 py-2.5 rounded-xl font-bold transition-all shadow-sm active:scale-95" style={{margin: 0}}>
+                        + Add Counter Metric
+                    </button>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     {(pageData.impactStats || []).map((s, i) => (
-                        <div key={i} className="p-4 bg-white border rounded shadow-sm text-center">
-                            <input type="text" className="form-input mb-2 font-bold text-center" placeholder="500M+" value={s.number || ''} onChange={e => handleArrayChange('impactStats', i, 'number', e.target.value)} />
-                            <input type="text" className="form-input mb-1 text-xs" placeholder="Top Label" value={s.label1 || ''} onChange={e => handleArrayChange('impactStats', i, 'label1', e.target.value)} />
-                            <input type="text" className="form-input text-xs" placeholder="Bottom Label" value={s.label2 || ''} onChange={e => handleArrayChange('impactStats', i, 'label2', e.target.value)} />
-                            <button type="button" onClick={() => removeArrayItem('impactStats', i)} className="text-red-500 text-[10px] mt-2 underline w-full">Remove</button>
+                        <div key={i} className="relative p-6 bg-gradient-to-b from-gray-50 to-white border border-gray-100 rounded-2xl shadow-sm text-center group">
+                            <button type="button" onClick={() => removeArrayItem('impactStats', i)} className="absolute top-2 right-2 text-gray-300 hover:text-red-500 font-bold bg-white rounded-full w-6 h-6 shadow-sm flex items-center justify-center transition-colors">×</button>
+                            
+                            <div className="space-y-3 pt-2">
+                                <input type="text" className="w-full bg-transparent text-center text-3xl font-black text-amber-600 placeholder-gray-300 focus:outline-none" placeholder="500M+" value={s.number || ''} onChange={e => handleArrayChange('impactStats', i, 'number', e.target.value)} />
+                                <div className="space-y-1">
+                                    <input type="text" className="w-full bg-transparent text-center text-[10px] font-black uppercase tracking-widest text-gray-800 focus:outline-none border-b border-transparent focus:border-amber-200 pb-1" placeholder="TOP LABEL" value={s.label1 || ''} onChange={e => handleArrayChange('impactStats', i, 'label1', e.target.value)} />
+                                    <input type="text" className="w-full bg-transparent text-center text-[11px] font-medium text-gray-500 focus:outline-none border-b border-transparent focus:border-amber-200 pb-1" placeholder="bottom label" value={s.label2 || ''} onChange={e => handleArrayChange('impactStats', i, 'label2', e.target.value)} />
+                                </div>
+                            </div>
                         </div>
                     ))}
+                    {pageData.impactStats?.length === 0 && <div className="col-span-full py-8 text-center text-gray-400 border-2 border-dashed border-gray-100 rounded-2xl">No metrics added yet.</div>}
                 </div>
             </div>
 
-            {/* ── SECTION 5: CTA SETTINGS ── */}
-            <div className="form-section">
-                <div className="section-header"><h3>Ready to Start (CTA)</h3></div>
-                <div className="form-grid-2">
-                    <div className="form-group"><label className="form-label">CTA Title</label><input type="text" className="form-input" value={pageData.ctaTitleMain || ''} onChange={e => setPageData({...pageData, ctaTitleMain: e.target.value})} /></div>
-                    <div className="form-group"><label className="form-label">CTA Highlight</label><input type="text" className="form-input" value={pageData.ctaTitleHighlight || ''} onChange={e => setPageData({...pageData, ctaTitleHighlight: e.target.value})} /></div>
-                </div>
-                <div className="form-group"><label className="form-label">CTA Description</label><textarea className="form-input" value={pageData.ctaDesc || ''} onChange={e => setPageData({...pageData, ctaDesc: e.target.value})} /></div>
-            </div>
-
-            {/* 🔥 GLOBAL SAVE BUTTON FOR ALL PAGE SETTINGS 🔥 */}
+            {/* ── GLOBAL STICKY SAVE BUTTON FOR PAGE SETTINGS ── */}
             <div className="mt-8 sticky bottom-4 z-50">
-                <button onClick={handlePageDataSave} disabled={submitting} className="w-full bg-[#1a1a1a] text-white p-5 rounded-lg text-xl font-bold uppercase tracking-widest shadow-[0_10px_30px_rgba(0,0,0,0.3)] hover:bg-[#b5862a] transition-all duration-300">
+                <button onClick={handlePageDataSave} className="w-full bg-[#1a1a1a] text-white p-5 rounded-lg text-xl font-bold uppercase tracking-widest shadow-2xl hover:bg-[#b5862a] transition-all duration-300">
                     {submitting ? 'SAVING...' : '💾 SAVE PAGE SETTINGS'}
                 </button>
             </div>
-            
         </div>
+            
+        
     );
 };
 

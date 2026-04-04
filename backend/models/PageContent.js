@@ -186,6 +186,16 @@ projectsPage: {
     ctaButtonLink: { type: String, default: '/contact' }
 },// 🔥 CAMPAIGNS PAGE DATA 🔥
     campaignsPage: {
+        // ── CAMPAIGN SPECIALTIES ──
+        specLabel: { type: String, default: 'Campaign Specialties' },
+        specTitleMain: { type: String, default: 'We Excel in' },
+        specTitleHighlight: { type: String, default: 'Every Campaign Type' },
+        specialties: [{
+            icon: { type: String },
+            title: { type: String },
+            desc: { type: String }
+        }],
+
         // ── RECENT HIGHLIGHTS / TRENDING ──
         trendingLabel: { type: String, default: 'Recent Highlights' },
         trendingTitleMain: { type: String, default: 'Trending' },
