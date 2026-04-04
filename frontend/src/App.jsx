@@ -5,6 +5,8 @@ import Home from './pages/public/Home';
 import About from './pages/public/About'; // Naya About Page
 import Studio from './pages/public/Studio';
 import Team from './pages/public/Team';
+import Projects from './pages/public/Projects';
+
 // Admin Pages
 import Login from './pages/admin/Login';
 import Dashboard from './pages/admin/Dashboard';
@@ -30,10 +32,11 @@ function App() {
       <Routes>
         {/* 🌐 MAIN WEBSITE */}
 
-        <Route path="/" element={<Home />} />
+        <Route path="/"element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/studio" element={<Studio />} />
         <Route path="/team" element={<Team />} />
+        <Route path="/projects" element={<Projects />} />
 
 
 

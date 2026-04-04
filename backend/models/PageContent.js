@@ -151,7 +151,40 @@ const pageContentSchema = new mongoose.Schema({
     careerButtonText: { type: String, default: 'Get In Touch' },
     careerButtonLink: { type: String, default: '/contact' }
   },
+// Apne existing schema mein ye add kar:
+projectsPage: {
+    // 1. Featured Projects Headings
+    projectsLabel: { type: String, default: 'OUR WORK' },
+    projectsTitleMain: { type: String, default: 'Featured' },
+    projectsTitleHighlight: { type: String, default: 'Projects' },
 
+    // 2. Case Studies Section
+    caseStudiesLabel: { type: String, default: 'CASE STUDIES' },
+    caseStudiesTitleMain: { type: String, default: 'Deep Dive into Our' },
+    caseStudiesTitleHighlight: { type: String, default: 'Best Work' },
+    caseStudies: [{
+        title: { type: String },
+        desc: { type: String },
+        type: { type: String } // e.g. Advertising, Documentary
+    }],
+
+    // 3. Stats Section (Portfolio by Numbers)
+    statsLabel: { type: String, default: 'OUR PORTFOLIO BY NUMBERS' },
+    statsTitleMain: { type: String, default: 'The' },
+    statsTitleHighlight: { type: String, default: 'Impact of Our Work' },
+    stats: [{
+        number: { type: String }, // e.g. "500M+"
+        label1: { type: String }, // e.g. "Views"
+        label2: { type: String }  // e.g. "Generated"
+    }],
+
+    // 4. CTA Section
+    ctaTitleMain: { type: String, default: 'Ready to Bring Your' },
+    ctaTitleHighlight: { type: String, default: 'Vision to Life?' },
+    ctaDesc: { type: String },
+    ctaButtonText: { type: String, default: 'Start Your Project' },
+    ctaButtonLink: { type: String, default: '/contact' }
+},
   // ── 6. FOOTER ──
   footer: {
     copyrightText: { type: String, default: '© 2026 Chillum Phillum. All rights reserved.' },

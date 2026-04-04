@@ -14,6 +14,17 @@ const ManageProjects = () => {
     const [submitting, setSubmitting] = useState(false);
     const [uploadingInfo, setUploadingInfo] = useState('');
 
+    // Page Data State (for case studies, stats, CTA)
+    const [pageData, setPageData] = useState({
+        caseStudiesTitleMain: '',
+        caseStudiesTitleHighlight: '',
+        caseStudies: [],
+        stats: [],
+        ctaTitleMain: '',
+        ctaTitleHighlight: '',
+        ctaDesc: ''
+    });
+
     // 🔥 Initial Form State matching updated Project.js Model
     const initialFormState = {
         title: '',
@@ -39,7 +50,20 @@ const ManageProjects = () => {
 
     useEffect(() => {
         fetchProjects();
+        fetchPageData();
     }, []);
+
+    // Fetch page data (case studies, stats, CTA)
+    const fetchPageData = async () => {
+        try {
+            const res = await axios.get(`${config.API_BASE_URL}/page-content`);
+            if (res.data.success && res.data.data?.projectsPage) {
+                setPageData(res.data.data.projectsPage);
+            }
+        } catch (err) {
+            console.error("Error fetching page data:", err);
+        }
+    };
 
     // Handle Form Input changes
     const handleChange = (e) => {
@@ -136,6 +160,46 @@ const ManageProjects = () => {
             } catch (err) {
                 alert('Failed to delete project.');
             }
+        }
+    };
+
+    // Add item to array fields (caseStudies, stats)
+    const addArrayItem = (field, newItem) => {
+        setPageData({
+            ...pageData,
+            [field]: [...(pageData[field] || []), newItem]
+        });
+    };
+
+    // Remove item from array fields
+    const removeArrayItem = (field, index) => {
+        setPageData({
+            ...pageData,
+            [field]: pageData[field].filter((_, i) => i !== index)
+        });
+    };
+
+    // Update nested array item properties
+    const handleArrayChange = (field, index, key, value) => {
+        const updatedArray = [...pageData[field]];
+        updatedArray[index] = { ...updatedArray[index], [key]: value };
+        setPageData({ ...pageData, [field]: updatedArray });
+    };
+
+    // Save page data (case studies, stats, CTA)
+    const handlePageDataSave = async () => {
+        setSubmitting(true);
+        try {
+            const dataToSave = {
+                projectsPage: pageData
+            };
+            await axios.post(`${config.API_BASE_URL}/page-content`, dataToSave);
+            setMessage({ text: '✅ Page settings saved successfully!', type: 'success' });
+            setTimeout(() => setMessage({ text: '', type: '' }), 3000);
+        } catch (err) {
+            setMessage({ text: '❌ Failed to save: ' + (err.response?.data?.message || err.message), type: 'error' });
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -304,6 +368,62 @@ const ManageProjects = () => {
                 </div>
             </div>
 
+            {/* ── SECTION 3: CASE STUDIES ── */}
+            <div className="form-section">
+                <div className="section-header" style={{justifyContent:'space-between'}}>
+                    <h3>Case Studies & Headings</h3>
+                    <button onClick={() => addArrayItem('caseStudies', {title:'', desc:'', type:''})} className="btn-add" style={{margin:0}}>+ Add Case Study</button>
+                </div>
+                <div className="form-grid-2 mb-4">
+                    <div className="form-group"><label className="form-label">Main Title</label><input type="text" className="form-input" value={pageData.caseStudiesTitleMain || ''} onChange={e => setPageData({...pageData, caseStudiesTitleMain: e.target.value})} /></div>
+                    <div className="form-group"><label className="form-label">Highlight Title</label><input type="text" className="form-input" value={pageData.caseStudiesTitleHighlight || ''} onChange={e => setPageData({...pageData, caseStudiesTitleHighlight: e.target.value})} /></div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {(pageData.caseStudies || []).map((cs, i) => (
+                        <div key={i} className="p-4 bg-gray-50 border rounded-lg relative">
+                            <button type="button" onClick={() => removeArrayItem('caseStudies', i)} className="absolute top-2 right-2 text-red-500 font-bold text-lg">×</button>
+                            <input type="text" className="form-input mb-2" placeholder="Title" value={cs.title || ''} onChange={e => handleArrayChange('caseStudies', i, 'title', e.target.value)} />
+                            <textarea className="form-input mb-2" placeholder="Description" value={cs.desc || ''} onChange={e => handleArrayChange('caseStudies', i, 'desc', e.target.value)} />
+                            <input type="text" className="form-input" placeholder="Type" value={cs.type || ''} onChange={e => handleArrayChange('caseStudies', i, 'type', e.target.value)} />
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* ── SECTION 4: IMPACT COUNTERS ── */}
+            <div className="form-section">
+                <div className="section-header" style={{justifyContent:'space-between'}}>
+                    <h3>Impact Counters</h3>
+                    <button onClick={() => addArrayItem('stats', {number:'', label1:'', label2:''})} className="btn-add" style={{margin:0}}>+ Add Counter</button>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {(pageData.stats || []).map((s, i) => (
+                        <div key={i} className="p-4 bg-white border rounded shadow-sm text-center">
+                            <input type="text" className="form-input mb-2 font-bold text-center" placeholder="500M+" value={s.number || ''} onChange={e => handleArrayChange('stats', i, 'number', e.target.value)} />
+                            <input type="text" className="form-input mb-1 text-xs" placeholder="Views" value={s.label1 || ''} onChange={e => handleArrayChange('stats', i, 'label1', e.target.value)} />
+                            <input type="text" className="form-input text-xs" placeholder="Generated" value={s.label2 || ''} onChange={e => handleArrayChange('stats', i, 'label2', e.target.value)} />
+                            <button type="button" onClick={() => removeArrayItem('stats', i)} className="text-red-500 text-[10px] mt-2 underline">Remove</button>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* ── SECTION 5: CTA SETTINGS ── */}
+            <div className="form-section">
+                <div className="section-header"><h3>Ready to Start (CTA)</h3></div>
+                <div className="form-grid-2">
+                    <div className="form-group"><label className="form-label">CTA Title</label><input type="text" className="form-input" value={pageData.ctaTitleMain || ''} onChange={e => setPageData({...pageData, ctaTitleMain: e.target.value})} /></div>
+                    <div className="form-group"><label className="form-label">CTA Highlight</label><input type="text" className="form-input" value={pageData.ctaTitleHighlight || ''} onChange={e => setPageData({...pageData, ctaTitleHighlight: e.target.value})} /></div>
+                </div>
+                <div className="form-group"><label className="form-label">CTA Description</label><textarea className="form-input" value={pageData.ctaDesc || ''} onChange={e => setPageData({...pageData, ctaDesc: e.target.value})} /></div>
+            </div>
+
+            {/* MASTER SAVE FOR ALL PAGE SETTINGS */}
+            <div className="mt-8 sticky bottom-4 z-50">
+                <button onClick={handlePageDataSave} className="w-full bg-[#1a1a1a] text-white p-5 rounded-lg text-xl font-bold uppercase tracking-widest shadow-2xl hover:bg-[#b5862a] transition-all duration-300">
+                    {submitting ? 'SAVING...' : '💾 SAVE PAGE SETTINGS'}
+                </button>
+            </div>
         </div>
     );
 };
