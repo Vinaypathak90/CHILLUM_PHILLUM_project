@@ -123,7 +123,7 @@ const sendOTPEmail = async (email, otpCode) => {
         // 🔥 EmailJS Direct API Call
         await emailjs.send(
             process.env.EMAILJS_SERVICE_ID, // Tera Service ID (service_q43v7e7)
-            'mr8ulie',                      // Teri exact Template ID
+            'template_o79zmha',                      // Teri exact Template ID
             { 
                 email: email,       // Template wala {{email}}
                 passcode: otpCode,  // Template wala {{passcode}}
