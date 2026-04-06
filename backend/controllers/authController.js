@@ -1,168 +1,169 @@
+require('dotenv').config(); // 🔥 Ensure .env is read properly
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
-const Admin = require('../models/Admin'); // Tera Admin model
-const User = require('../models/User');   // Naya User/Member model
-const OTP = require('../models/OTP');     // OTP model
-const adminFirebase = require('../config/firebaseAdmin'); // Firebase Setup
+const Admin = require('../models/Admin'); 
+const User = require('../models/User');   
+const OTP = require('../models/OTP');     
+const adminFirebase = require('../config/firebaseAdmin'); 
 
 // ============================================================================
-// 🔥 1. OLD CODE: ADMIN AUTHENTICATION (UNTOUCHED) 🔥
+// 🔥 1. ADMIN AUTHENTICATION (UNTOUCHED) 🔥
 // ============================================================================
 
-// @desc    Authenticate admin & get tokens (Access + Refresh)
-// @route   POST /api/auth/login
-// @access  Public
 const loginAdmin = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        // 1. Check if admin exists
         const admin = await Admin.findOne({ email });
 
-        // 2. Verify password (assuming matchPassword exists in your Admin model)
         if (admin && (await admin.matchPassword(password))) {
-            
-            // 3. Generate Access Token (Short life: 15 Minutes)
-            // Ye token frontend har API request ke header me bhejega
             const accessToken = jwt.sign(
                 { id: admin._id }, 
                 process.env.JWT_ACCESS_SECRET, 
                 { expiresIn: '15m' }
             );
 
-            // 4. Generate Refresh Token (Long life: 7 Days)
-            // Ye token naya Access Token laane ke kaam aayega
             const refreshToken = jwt.sign(
                 { id: admin._id }, 
                 process.env.JWT_REFRESH_SECRET, 
                 { expiresIn: '7d' }
             );
 
-            // 5. Set Refresh Token in HttpOnly Cookie 
-            // Ye sabse secure tareeka hai, hackers isko JS se read nahi kar sakte
             res.cookie('jwt_refresh', refreshToken, {
                 httpOnly: true, 
-                secure: true, // true rakhna kyunki Vercel/Render dono HTTPS use karte hain
-                sameSite: 'None', // Cross-origin requests ke liye zaroori (Frontend -> Backend)
-                maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days in milliseconds
+                secure: true, 
+                sameSite: 'None', 
+                maxAge: 7 * 24 * 60 * 60 * 1000 
             });
 
-            // 6. Send Access Token & Admin Info in JSON
             res.status(200).json({
                 success: true,
                 message: 'Login successful!',
                 _id: admin.id,
                 email: admin.email,
-                accessToken: accessToken, // Frontend isko LocalStorage/Memory me save karega
+                accessToken: accessToken, 
             });
             
         } else {
             res.status(401).json({ success: false, message: 'Invalid email or password' });
         }
     } catch (error) {
-        console.error('Login Error:', error);
-        res.status(500).json({ success: false, message: 'Server error during login' });
+        console.error('🔥 Admin Login Error:', error.message);
+        res.status(500).json({ success: false, message: 'Server error during login', error: error.message });
     }
 };
 
-// @desc    Get new Access Token using Refresh Token
-// @route   POST /api/auth/refresh
-// @access  Public (But needs valid cookie)
 const refreshAdmin = (req, res) => {
-    // 1. Cookie se refresh token nikal 
-    // (Agar yahan undefined aaye toh server.js me cookie-parser aur cors check karna)
-    const refreshToken = req.cookies?.jwt_refresh;
+    try {
+        const refreshToken = req.cookies?.jwt_refresh;
 
-    if (!refreshToken) {
-        return res.status(401).json({ success: false, message: 'Unauthorized, no refresh token found' });
-    }
-
-    // 2. Verify the Refresh Token
-    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, (err, decoded) => {
-        if (err) {
-            return res.status(403).json({ success: false, message: 'Forbidden, token expired or invalid' });
+        if (!refreshToken) {
+            return res.status(401).json({ success: false, message: 'Unauthorized, no refresh token found' });
         }
 
-        // 3. Agar token sahi hai, toh ek naya Access Token banao
-        const newAccessToken = jwt.sign(
-            { id: decoded.id }, 
-            process.env.JWT_ACCESS_SECRET, 
-            { expiresIn: '15m' }
-        );
+        jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, (err, decoded) => {
+            if (err) {
+                console.error('🔥 Refresh Token Error:', err.message);
+                return res.status(403).json({ success: false, message: 'Forbidden, token expired or invalid' });
+            }
 
-        // 4. Send new Access Token to frontend
-        res.status(200).json({ 
-            success: true, 
-            accessToken: newAccessToken 
+            const newAccessToken = jwt.sign(
+                { id: decoded.id }, 
+                process.env.JWT_ACCESS_SECRET, 
+                { expiresIn: '15m' }
+            );
+
+            res.status(200).json({ success: true, accessToken: newAccessToken });
         });
-    });
+    } catch (error) {
+        console.error('🔥 Refresh Token Server Error:', error.message);
+        res.status(500).json({ success: false, message: 'Server error during token refresh' });
+    }
 };
 
-// @desc    Logout Admin & clear cookie
-// @route   POST /api/auth/logout
-// @access  Public
 const logoutAdmin = (req, res) => {
-    // Cookie ko clear kar do taaki refresh token ud jaye
-    res.clearCookie('jwt_refresh', {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'None'
-    });
-    
-    res.status(200).json({ success: true, message: 'Logged out successfully' });
+    try {
+        res.clearCookie('jwt_refresh', {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'None'
+        });
+        res.status(200).json({ success: true, message: 'Logged out successfully' });
+    } catch (error) {
+        console.error('🔥 Logout Error:', error.message);
+        res.status(500).json({ success: false, message: 'Error during logout' });
+    }
 };
 
 
 // ============================================================================
-// 🔥 2. NEW FEATURES: USER/MEMBER AUTHENTICATION & OTP FLOW 🔥
+// 🔥 2. USER/MEMBER AUTHENTICATION & OTP FLOW 🔥
 // ============================================================================
 
 // ─── HELPER: Send OTP via Email ───
 const sendOTPEmail = async (email, otpCode) => {
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-        }
-    });
+    // 🚨 DEBUGGING LOGS FOR RENDER
+    console.log("\n-----------------------------------------");
+    console.log("📧 Attempting to send OTP to:", email);
+    console.log("🔑 Checking Env -> EMAIL_USER:", process.env.EMAIL_USER ? "LOADED ✅" : "MISSING ❌");
+    console.log("🔑 Checking Env -> EMAIL_PASS:", process.env.EMAIL_PASS ? "LOADED ✅" : "MISSING ❌");
+    console.log("-----------------------------------------\n");
 
-    const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: "Chillum Phillum - Security Code",
-        html: `
-            <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px;">
-                <h2 style="color: #292e91; text-align: center;">Chillum Phillum</h2>
-                <p style="font-size: 16px; color: #333;">Hello,</p>
-                <p style="font-size: 16px; color: #333;">Your verification code is:</p>
-                <div style="text-align: center; margin: 20px 0;">
-                    <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #b5862a;">${otpCode}</span>
+    try {
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: "Chillum Phillum - Security Code",
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px;">
+                    <h2 style="color: #292e91; text-align: center;">Chillum Phillum</h2>
+                    <p style="font-size: 16px; color: #333;">Hello,</p>
+                    <p style="font-size: 16px; color: #333;">Your verification code is:</p>
+                    <div style="text-align: center; margin: 20px 0;">
+                        <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #b5862a;">${otpCode}</span>
+                    </div>
+                    <p style="font-size: 14px; color: #888; text-align: center;">This code will expire in 5 minutes. Do not share it with anyone.</p>
                 </div>
-                <p style="font-size: 14px; color: #888; text-align: center;">This code will expire in 5 minutes. Do not share it with anyone.</p>
-            </div>
-        `
-    };
+            `
+        };
 
-    await transporter.sendMail(mailOptions);
+        await transporter.sendMail(mailOptions);
+        console.log(`✅ Email sent successfully to: ${email}`);
+    } catch (error) {
+        console.error("❌ NODEMAILER CRASH ERROR:", error.message);
+        throw error; // Re-throw to be caught by the calling function
+    }
 };
 
 // ─── HELPER: Generate Tokens & Set Cookie for Users ───
 const sendUserTokenResponse = (user, statusCode, res, message) => {
-    const accessToken = jwt.sign({ id: user._id }, process.env.JWT_ACCESS_SECRET, { expiresIn: '15m' });
-    const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
+    try {
+        const accessToken = jwt.sign({ id: user._id }, process.env.JWT_ACCESS_SECRET, { expiresIn: '15m' });
+        const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
 
-    res.cookie('jwt_refresh', refreshToken, {
-        httpOnly: true, secure: true, sameSite: 'None', maxAge: 7 * 24 * 60 * 60 * 1000 
-    });
+        res.cookie('jwt_refresh', refreshToken, {
+            httpOnly: true, secure: true, sameSite: 'None', maxAge: 7 * 24 * 60 * 60 * 1000 
+        });
 
-    res.status(statusCode).json({
-        success: true,
-        message,
-        accessToken,
-        user: { name: user.name, email: user.email }
-    });
+        res.status(statusCode).json({
+            success: true,
+            message,
+            accessToken,
+            user: { name: user.name, email: user.email }
+        });
+    } catch (error) {
+        console.error("🔥 Token Generation Error:", error.message);
+        res.status(500).json({ success: false, message: 'Error generating auth tokens' });
+    }
 };
 
 
@@ -178,6 +179,7 @@ const loginUser = async (req, res) => {
 
         sendUserTokenResponse(user, 200, res, "Login successful!");
     } catch (error) {
+        console.error('🔥 User Login Error:', error.message);
         res.status(500).json({ success: false, message: 'Server error during login' });
     }
 };
@@ -199,7 +201,8 @@ const requestSignupOTP = async (req, res) => {
 
         res.status(200).json({ success: true, message: "OTP sent successfully" });
     } catch (error) {
-        res.status(500).json({ success: false, message: "Error sending OTP" });
+        console.error("🔥 Signup OTP Request Failed:", error.message);
+        res.status(500).json({ success: false, message: "Error sending OTP. Please try again.", error: error.message });
     }
 };
 
@@ -217,9 +220,9 @@ const verifySignupOTP = async (req, res) => {
 
         await OTP.deleteOne({ _id: otpRecord._id });
 
-        // Generate tokens and set cookie securely
         sendUserTokenResponse(newUser, 201, res, "Account created successfully");
     } catch (error) {
+        console.error("🔥 OTP Verification Error:", error.message);
         res.status(500).json({ success: false, message: "Error verifying OTP" });
     }
 };
@@ -241,7 +244,8 @@ const requestForgotPasswordOTP = async (req, res) => {
 
         res.status(200).json({ success: true, message: "Password reset OTP sent!" });
     } catch (error) {
-        res.status(500).json({ success: false, message: "Error sending reset OTP" });
+        console.error("🔥 Forgot Password OTP Failed:", error.message);
+        res.status(500).json({ success: false, message: "Error sending reset OTP", error: error.message });
     }
 };
 
@@ -260,6 +264,7 @@ const resetPassword = async (req, res) => {
 
         res.status(200).json({ success: true, message: "Password updated successfully" });
     } catch (error) {
+        console.error("🔥 Reset Password Error:", error.message);
         res.status(500).json({ success: false, message: "Error resetting password" });
     }
 };
@@ -268,45 +273,35 @@ const resetPassword = async (req, res) => {
 // ─── F. GOOGLE LOGIN (Firebase Integration) ───
 const googleLogin = async (req, res) => {
     try {
-        const { token } = req.body; // Firebase idToken from Frontend
+        const { token } = req.body; 
 
         if (!token) return res.status(400).json({ success: false, message: "Token is required" });
 
-        // Verify Firebase Token
         const decodedToken = await adminFirebase.auth().verifyIdToken(token);
         const { email, name, picture, uid } = decodedToken;
 
-        // Check if user exists, else create
         let user = await User.findOne({ email });
         if (!user) {
             user = await User.create({
                 name: name || 'Google User',
                 email: email,
-                password: uid, // Fallback password for Google users
+                password: uid, 
                 profilePic: picture,
                 authProvider: 'google'
             });
         }
 
-        // Generate tokens and set cookie securely
         sendUserTokenResponse(user, 200, res, "Google Login Successful");
     } catch (error) {
-        console.error("Google Auth Error:", error);
+        console.error("🔥 Google Auth Error:", error.message);
         res.status(401).json({ success: false, message: "Invalid or expired Google Token" });
     }
 };
 
-
-// ============================================================================
-// 🔥 EXPORT ALL CONTROLLERS 🔥
-// ============================================================================
 module.exports = {
-    // Admin Routes
     loginAdmin,
     refreshAdmin,
     logoutAdmin,
-    
-    // User / Member Routes
     loginUser,
     requestSignupOTP,
     verifySignupOTP,
