@@ -8,6 +8,19 @@ const OTP = require('../models/OTP');
 const adminFirebase = require('../config/firebaseAdmin'); 
 
 // ============================================================================
+// 🚨 HIGH SECURITY VIP LOUNGE (ONLY ALLOWED USERS) 🚨
+// ============================================================================
+const VIP_EMAILS = [
+    'vinaypathak2772@gmail.com', // 👈 YAHAN APNI PEHLI EMAIL DAAL (e.g., 'teri.email@gmail.com')
+    'researchbuimb24@gmail.com'  // 👈 YAHAN APNI DUSRI EMAIL DAAL (e.g., 'dost.ki.email@gmail.com')
+].map(email => email.toLowerCase()); // Security ke liye sabko small letters mein convert kar diya
+
+const isVIP = (email) => {
+    if (!email) return false;
+    return VIP_EMAILS.includes(email.toLowerCase());
+};
+
+// ============================================================================
 // 🔥 1. ADMIN AUTHENTICATION (UNTOUCHED) 🔥
 // ============================================================================
 
@@ -167,6 +180,9 @@ const sendUserTokenResponse = (user, statusCode, res, message) => {
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
     try {
+        // ⛔ BOUNCER CHECK
+        if (!isVIP(email)) return res.status(403).json({ success: false, message: '⛔ ACCESS DENIED: Entry restricted to authorized users only!' });
+
         // 🔥 FIX 2: .select('+password') lagana padega warna database password hide kar dega
         const user = await User.findOne({ email }).select('+password');
         
@@ -192,6 +208,10 @@ const loginUser = async (req, res) => {
 const requestSignupOTP = async (req, res) => {
     try {
         const { email } = req.body;
+
+        // ⛔ BOUNCER CHECK
+        if (!isVIP(email)) return res.status(403).json({ success: false, message: '⛔ ACCESS DENIED: Registration is closed for public.' });
+
         const existingUser = await User.findOne({ email });
         
         if (existingUser) return res.status(400).json({ success: false, message: "Email is already registered. Please sign in." });
@@ -215,6 +235,9 @@ const verifySignupOTP = async (req, res) => {
     try {
         const { name, email, password, otp } = req.body;
 
+        // ⛔ BOUNCER CHECK
+        if (!isVIP(email)) return res.status(403).json({ success: false, message: '⛔ ACCESS DENIED' });
+
         const otpRecord = await OTP.findOne({ email, otp });
         if (!otpRecord) return res.status(400).json({ success: false, message: "Invalid or expired OTP!" });
 
@@ -235,6 +258,10 @@ const verifySignupOTP = async (req, res) => {
 const requestForgotPasswordOTP = async (req, res) => {
     try {
         const { email } = req.body;
+
+        // ⛔ BOUNCER CHECK
+        if (!isVIP(email)) return res.status(403).json({ success: false, message: '⛔ ACCESS DENIED: Account does not exist or access restricted.' });
+
         const user = await User.findOne({ email });
         
         if (!user) return res.status(404).json({ success: false, message: "No account found with this email." });
@@ -257,6 +284,9 @@ const requestForgotPasswordOTP = async (req, res) => {
 const resetPassword = async (req, res) => {
     try {
         const { email, otp, newPassword } = req.body;
+
+        // ⛔ BOUNCER CHECK
+        if (!isVIP(email)) return res.status(403).json({ success: false, message: '⛔ ACCESS DENIED' });
 
         const otpRecord = await OTP.findOne({ email, otp });
         if (!otpRecord) return res.status(400).json({ success: false, message: "Invalid or expired OTP!" });
@@ -282,6 +312,9 @@ const googleLogin = async (req, res) => {
 
         const decodedToken = await adminFirebase.auth().verifyIdToken(token);
         const { email, name, picture, uid } = decodedToken;
+
+        // ⛔ BOUNCER CHECK
+        if (!isVIP(email)) return res.status(403).json({ success: false, message: '⛔ ACCESS DENIED: Your Google account is not authorized.' });
 
         let user = await User.findOne({ email });
         if (!user) {
