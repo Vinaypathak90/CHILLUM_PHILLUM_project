@@ -1,7 +1,7 @@
 require('dotenv').config(); // 🔥 Ensure .env is read properly
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const emailjs = require('@emailjs/nodejs'); // 🔥 EmailJS lagaya Nodemailer ki jagah
+const emailjs = require('@emailjs/nodejs'); // 🔥 EmailJS API
 const Admin = require('../models/Admin'); 
 const User = require('../models/User');   
 const OTP = require('../models/OTP');     
@@ -103,7 +103,6 @@ const logoutAdmin = (req, res) => {
 
 // ─── HELPER: Send OTP via EmailJS (Fail-Proof API Method) ───
 const sendOTPEmail = async (email, otpCode) => {
-    // 🚨 DEBUGGING LOGS FOR RENDER
     console.log("\n-----------------------------------------");
     console.log("📧 Attempting to send OTP via EmailJS to:", email);
     console.log("🔑 Checking Env -> EMAILJS_SERVICE_ID:", process.env.EMAILJS_SERVICE_ID ? "LOADED ✅" : "MISSING ❌");
@@ -111,23 +110,23 @@ const sendOTPEmail = async (email, otpCode) => {
     console.log("-----------------------------------------\n");
 
     try {
-        // 🔥 Time calculate kar rahe hain (15 mins aage)
+        // 🔥 FIX 1: Timezone specifically set to IST (India) so Render doesn't use UTC (London)
         const expireDate = new Date();
         expireDate.setMinutes(expireDate.getMinutes() + 15);
         const formattedTime = expireDate.toLocaleTimeString('en-IN', { 
+            timeZone: 'Asia/Kolkata', // 👈 YE LINE ZAROORI HAI INDIA TIME KE LIYE
             hour: '2-digit', 
             minute: '2-digit',
             hour12: true 
         });
 
-        // 🔥 EmailJS Direct API Call
         await emailjs.send(
-            process.env.EMAILJS_SERVICE_ID, // Tera Service ID (service_q43v7e7)
-            'template_o79zmha',                      // Teri exact Template ID
+            process.env.EMAILJS_SERVICE_ID, 
+            'template_o79zmha',                      
             { 
-                email: email,       // Template wala {{email}}
-                passcode: otpCode,  // Template wala {{passcode}}
-                time: formattedTime // Template wala {{time}}
+                email: email,       
+                passcode: otpCode,  
+                time: formattedTime 
             },
             {
                 publicKey: process.env.EMAILJS_PUBLIC_KEY,
@@ -137,7 +136,7 @@ const sendOTPEmail = async (email, otpCode) => {
         console.log(`✅ Premium HTML OTP Sent Successfully! Valid till: ${formattedTime}`);
     } catch (error) {
         console.error("❌ EMAILJS CRASH ERROR:", error);
-        throw error; // Re-throw to be caught by the calling function
+        throw error; 
     }
 };
 
@@ -168,8 +167,15 @@ const sendUserTokenResponse = (user, statusCode, res, message) => {
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
     try {
-        const user = await User.findOne({ email });
+        // 🔥 FIX 2: .select('+password') lagana padega warna database password hide kar dega
+        const user = await User.findOne({ email }).select('+password');
+        
         if (!user) return res.status(401).json({ success: false, message: 'Invalid email or password' });
+
+        // 🔥 Agar user Google se login kiya tha aur password hai hi nahi
+        if (!user.password) {
+            return res.status(400).json({ success: false, message: 'Please login using Google Auth.' });
+        }
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(401).json({ success: false, message: 'Invalid email or password' });
