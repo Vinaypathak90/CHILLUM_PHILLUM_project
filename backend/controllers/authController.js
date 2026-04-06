@@ -1,12 +1,12 @@
 require('dotenv').config(); // 🔥 Ensure .env is read properly
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const nodemailer = require('nodemailer');
+const emailjs = require('@emailjs/nodejs'); // 🔥 EmailJS lagaya Nodemailer ki jagah
 const Admin = require('../models/Admin'); 
 const User = require('../models/User');   
 const OTP = require('../models/OTP');     
 const adminFirebase = require('../config/firebaseAdmin'); 
-require('dns').setDefaultResultOrder('ipv4first');
+
 // ============================================================================
 // 🔥 1. ADMIN AUTHENTICATION (UNTOUCHED) 🔥
 // ============================================================================
@@ -101,51 +101,42 @@ const logoutAdmin = (req, res) => {
 // 🔥 2. USER/MEMBER AUTHENTICATION & OTP FLOW 🔥
 // ============================================================================
 
-// ─── HELPER: Send OTP via Email ───
+// ─── HELPER: Send OTP via EmailJS (Fail-Proof API Method) ───
 const sendOTPEmail = async (email, otpCode) => {
     // 🚨 DEBUGGING LOGS FOR RENDER
     console.log("\n-----------------------------------------");
-    console.log("📧 Attempting to send OTP to:", email);
-    console.log("🔑 Checking Env -> EMAIL_USER:", process.env.EMAIL_USER ? "LOADED ✅" : "MISSING ❌");
-    console.log("🔑 Checking Env -> EMAIL_PASS:", process.env.EMAIL_PASS ? "LOADED ✅" : "MISSING ❌");
+    console.log("📧 Attempting to send OTP via EmailJS to:", email);
+    console.log("🔑 Checking Env -> EMAILJS_SERVICE_ID:", process.env.EMAILJS_SERVICE_ID ? "LOADED ✅" : "MISSING ❌");
+    console.log("🔑 Checking Env -> EMAILJS_PUBLIC_KEY:", process.env.EMAILJS_PUBLIC_KEY ? "LOADED ✅" : "MISSING ❌");
     console.log("-----------------------------------------\n");
 
     try {
-       const transporter = nodemailer.createTransport({
-            service: 'gmail', // Double safety
-            
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            },
-            tls: {
-                rejectUnauthorized: false,
-                minVersion: 'TLSv1.2'
-
-            }
+        // 🔥 Time calculate kar rahe hain (15 mins aage)
+        const expireDate = new Date();
+        expireDate.setMinutes(expireDate.getMinutes() + 15);
+        const formattedTime = expireDate.toLocaleTimeString('en-IN', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            hour12: true 
         });
 
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: "Chillum Phillum - Security Code",
-            html: `
-                <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px;">
-                    <h2 style="color: #292e91; text-align: center;">Chillum Phillum</h2>
-                    <p style="font-size: 16px; color: #333;">Hello,</p>
-                    <p style="font-size: 16px; color: #333;">Your verification code is:</p>
-                    <div style="text-align: center; margin: 20px 0;">
-                        <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #b5862a;">${otpCode}</span>
-                    </div>
-                    <p style="font-size: 14px; color: #888; text-align: center;">This code will expire in 5 minutes. Do not share it with anyone.</p>
-                </div>
-            `
-        };
-
-        await transporter.sendMail(mailOptions);
-        console.log(`✅ Email sent successfully to: ${email}`);
+        // 🔥 EmailJS Direct API Call
+        await emailjs.send(
+            process.env.EMAILJS_SERVICE_ID, // Tera Service ID (service_q43v7e7)
+            'mr8ulie',                      // Teri exact Template ID
+            { 
+                email: email,       // Template wala {{email}}
+                passcode: otpCode,  // Template wala {{passcode}}
+                time: formattedTime // Template wala {{time}}
+            },
+            {
+                publicKey: process.env.EMAILJS_PUBLIC_KEY,
+                privateKey: process.env.EMAILJS_PRIVATE_KEY,
+            }
+        );
+        console.log(`✅ Premium HTML OTP Sent Successfully! Valid till: ${formattedTime}`);
     } catch (error) {
-        console.error("❌ NODEMAILER CRASH ERROR:", error.message);
+        console.error("❌ EMAILJS CRASH ERROR:", error);
         throw error; // Re-throw to be caught by the calling function
     }
 };
