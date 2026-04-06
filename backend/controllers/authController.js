@@ -6,7 +6,7 @@ const Admin = require('../models/Admin');
 const User = require('../models/User');   
 const OTP = require('../models/OTP');     
 const adminFirebase = require('../config/firebaseAdmin'); 
-
+require('dns').setDefaultResultOrder('ipv4first');
 // ============================================================================
 // 🔥 1. ADMIN AUTHENTICATION (UNTOUCHED) 🔥
 // ============================================================================
@@ -111,17 +111,11 @@ const sendOTPEmail = async (email, otpCode) => {
     console.log("-----------------------------------------\n");
 
     try {
-       const transporter = nodemailer.createTransport({
-            service: 'gmail', // Double safety
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true,
+      const transporter = nodemailer.createTransport({
+            service: 'gmail',
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS
-            },
-            tls: {
-                rejectUnauthorized: false 
             }
         });
 
