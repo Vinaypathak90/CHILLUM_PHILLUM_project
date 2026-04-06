@@ -10,10 +10,9 @@ const adminFirebase = require('../config/firebaseAdmin');
 // ============================================================================
 // 🚨 HIGH SECURITY VIP LOUNGE (ONLY ALLOWED USERS) 🚨
 // ============================================================================
-const VIP_EMAILS = [
-    'vinaypathak2772@gmail.com', // 👈 YAHAN APNI PEHLI EMAIL DAAL (e.g., 'teri.email@gmail.com')
-    'researchbuimb24@gmail.com'  // 👈 YAHAN APNI DUSRI EMAIL DAAL (e.g., 'dost.ki.email@gmail.com')
-].map(email => email.toLowerCase()); // Security ke liye sabko small letters mein convert kar diya
+const VIP_EMAILS = process.env.VIP_EMAILS 
+    ? process.env.VIP_EMAILS.split(',').map(email => email.trim().toLowerCase()) 
+    : [];
 
 const isVIP = (email) => {
     if (!email) return false;
