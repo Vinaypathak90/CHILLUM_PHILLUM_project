@@ -26,8 +26,6 @@ api.interceptors.request.use(
     }
 );
 
-// 3. 🛡️ RESPONSE INTERCEPTOR: Har API response backend se aane ke baad yahan se guzregi
-// Isko abhi ke liye aise hi chhod de, baad mein jab Refresh Token flow banayenge tab isme logic dalenge
 api.interceptors.response.use(
     (response) => {
         return response;
