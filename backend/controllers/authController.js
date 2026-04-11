@@ -8,7 +8,7 @@ const OTP = require('../models/OTP');
 const adminFirebase = require('../config/firebaseAdmin'); 
 
 // ============================================================================
-// 🚨 HIGH SECURITY VIP LOUNGE (ONLY ALLOWED USERS) 🚨
+//                🚨 HIGH SECURITY VIP LOUNGE (ONLY ALLOWED USERS) 🚨
 // ============================================================================
 const VIP_EMAILS = process.env.VIP_EMAILS 
     ? process.env.VIP_EMAILS.split(',').map(email => email.trim().toLowerCase()) 
@@ -20,7 +20,7 @@ const isVIP = (email) => {
 };
 
 // ============================================================================
-// 🔥 1. ADMIN AUTHENTICATION (UNTOUCHED) 🔥
+//                 🔥 1. ADMIN AUTHENTICATION (UNTOUCHED) 🔥
 // ============================================================================
 
 const loginAdmin = async (req, res) => {
@@ -110,7 +110,7 @@ const logoutAdmin = (req, res) => {
 
 
 // ============================================================================
-// 🔥 2. USER/MEMBER AUTHENTICATION & OTP FLOW 🔥
+// 🔥                3. USER/MEMBER AUTHENTICATION & OTP FLOW 🔥
 // ============================================================================
 
 // ─── HELPER: Send OTP via EmailJS (Fail-Proof API Method) ───
@@ -151,8 +151,9 @@ const sendOTPEmail = async (email, otpCode) => {
         throw error; 
     }
 };
-
-// ─── HELPER: Generate Tokens & Set Cookie for Users ───
+// ============================================================================
+//             ─── HELPER: Generate Tokens & Set Cookie for Users ───
+// ============================================================================
 const sendUserTokenResponse = (user, statusCode, res, message) => {
     try {
         const accessToken = jwt.sign({ id: user._id }, process.env.JWT_ACCESS_SECRET, { expiresIn: '15m' });
@@ -173,9 +174,10 @@ const sendUserTokenResponse = (user, statusCode, res, message) => {
         res.status(500).json({ success: false, message: 'Error generating auth tokens' });
     }
 };
+// ============================================================================
 
-
-// ─── A. USER LOGIN (Standard Email/Password) ───
+//       ─── A. USER LOGIN (Standard Email/Password) ───
+// ============================================================================
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -202,8 +204,9 @@ const loginUser = async (req, res) => {
     }
 };
 
-
+// ============================================================================
 // ─── B. SIGNUP OTP REQUEST ───
+// ============================================================================
 const requestSignupOTP = async (req, res) => {
     try {
         const { email } = req.body;
@@ -227,9 +230,10 @@ const requestSignupOTP = async (req, res) => {
         res.status(500).json({ success: false, message: "Error sending OTP. Please try again.", error: error.message });
     }
 };
+// ============================================================================
 
-
-// ─── C. VERIFY SIGNUP OTP & CREATE ACCOUNT ───
+//    ─── C. VERIFY SIGNUP OTP & CREATE ACCOUNT ───
+// ============================================================================
 const verifySignupOTP = async (req, res) => {
     try {
         const { name, email, password, otp } = req.body;
@@ -251,9 +255,10 @@ const verifySignupOTP = async (req, res) => {
         res.status(500).json({ success: false, message: "Error verifying OTP" });
     }
 };
-
+// ============================================================================
 
 // ─── D. REQUEST OTP FOR FORGOT PASSWORD ───
+// ============================================================================
 const requestForgotPasswordOTP = async (req, res) => {
     try {
         const { email } = req.body;
@@ -277,9 +282,10 @@ const requestForgotPasswordOTP = async (req, res) => {
         res.status(500).json({ success: false, message: "Error sending reset OTP", error: error.message });
     }
 };
-
+// ============================================================================
 
 // ─── E. VERIFY OTP & RESET PASSWORD ───
+// ============================================================================
 const resetPassword = async (req, res) => {
     try {
         const { email, otp, newPassword } = req.body;
@@ -300,9 +306,10 @@ const resetPassword = async (req, res) => {
         res.status(500).json({ success: false, message: "Error resetting password" });
     }
 };
-
+// ============================================================================
 
 // ─── F. GOOGLE LOGIN (Firebase Integration) ───
+// ============================================================================
 const googleLogin = async (req, res) => {
     try {
         const { token } = req.body; 

@@ -1,8 +1,9 @@
 const PageContent = require('../models/PageContent');
-
+// ============================================================================
 // @desc    Get all global page content
 // @route   GET /api/page-content
 // @access  Public
+// ============================================================================
 const getPageContent = async (req, res) => {
     try {
         // We use findOne because there should only be one settings document
@@ -25,10 +26,11 @@ const getPageContent = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
-
+// ============================================================================
 // @desc    Update or Initialize global page content
 // @route   POST /api/page-content
 // @access  Private (Admin Only)
+// ============================================================================
 const updatePageContent = async (req, res) => {
     try {
         let content = await PageContent.findOne();

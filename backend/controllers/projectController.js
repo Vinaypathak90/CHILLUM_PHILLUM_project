@@ -1,8 +1,9 @@
 const Project = require('../models/Project');
-
+// ============================================================================
 // @desc    Get all projects (Ordered by the 'order' field)
 // @route   GET /api/projects
 // @access  Public
+// ============================================================================
 const getProjects = async (req, res) => {
     try {
         const projects = await Project.find().sort({ order: 1 });
@@ -15,10 +16,11 @@ const getProjects = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
-
+// ============================================================================
 // @desc    Create a new project
 // @route   POST /api/projects
 // @access  Private (Admin Only - Auth middleware will be added later)
+// ============================================================================
 const createProject = async (req, res) => {
     try {
         const project = await Project.create(req.body);
@@ -32,9 +34,11 @@ const createProject = async (req, res) => {
     }
 };
 
+// ============================================================================
 // @desc    Update an existing project
 // @route   PUT /api/projects/:id
 // @access  Private (Admin Only)
+// ============================================================================
 const updateProject = async (req, res) => {
     try {
         let project = await Project.findById(req.params.id);

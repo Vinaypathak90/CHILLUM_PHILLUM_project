@@ -1,8 +1,9 @@
 const Campaign = require('../models/Campaign');
-
-// @desc    Get all campaigns (Sorted by 'order')
-// @route   GET /api/campaigns
+// ============================================================================
+//   @desc    Get all campaigns (Sorted by 'order')
+//    @route   GET /api/campaigns
 // @access  Public
+// ============================================================================
 const getCampaigns = async (req, res) => {
     try {
         // By default, we only show 'published' campaigns to the public
@@ -17,10 +18,11 @@ const getCampaigns = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
-
+// ============================================================================
 // @desc    Create a new campaign/news update
 // @route   POST /api/campaigns
 // @access  Private (Admin Only)
+// ============================================================================
 const createCampaign = async (req, res) => {
     try {
         const campaign = await Campaign.create(req.body);
@@ -33,10 +35,11 @@ const createCampaign = async (req, res) => {
         res.status(400).json({ success: false, message: error.message });
     }
 };
-
+// ============================================================================
 // @desc    Update a campaign
 // @route   PUT /api/campaigns/:id
 // @access  Private (Admin Only)
+// ============================================================================
 const updateCampaign = async (req, res) => {
     try {
         let campaign = await Campaign.findById(req.params.id);
@@ -59,10 +62,11 @@ const updateCampaign = async (req, res) => {
         res.status(400).json({ success: false, message: error.message });
     }
 };
-
+// ============================================================================
 // @desc    Delete a campaign
 // @route   DELETE /api/campaigns/:id
 // @access  Private (Admin Only)
+// ============================================================================
 const deleteCampaign = async (req, res) => {
     try {
         const campaign = await Campaign.findById(req.params.id);

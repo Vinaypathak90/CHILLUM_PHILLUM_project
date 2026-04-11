@@ -1,8 +1,9 @@
 const Team = require('../models/Team');
-
+// ============================================================================
 // @desc    Get all team members (Sorted by 'order')
 // @route   GET /api/team
 // @access  Public
+// ============================================================================
 const getTeamMembers = async (req, res) => {
     try {
         const team = await Team.find().sort({ order: 1 });
@@ -15,10 +16,11 @@ const getTeamMembers = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
-
+// ============================================================================
 // @desc    Add a new team member
 // @route   POST /api/team
 // @access  Private (Admin Only)
+// ============================================================================
 const addTeamMember = async (req, res) => {
     try {
         const member = await Team.create(req.body);
@@ -31,7 +33,7 @@ const addTeamMember = async (req, res) => {
         res.status(400).json({ success: false, message: error.message });
     }
 };
-
+// ============================================================================
 // @desc    Update a team member's details
 // @route   PUT /api/team/:id
 // @access  Private (Admin Only)
@@ -57,10 +59,11 @@ const updateTeamMember = async (req, res) => {
         res.status(400).json({ success: false, message: error.message });
     }
 };
-
+// ============================================================================
 // @desc    Remove a team member
 // @route   DELETE /api/team/:id
 // @access  Private (Admin Only)
+// ============================================================================
 const deleteTeamMember = async (req, res) => {
     try {
         const member = await Team.findById(req.params.id);

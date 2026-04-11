@@ -1,7 +1,8 @@
 const Client = require('../models/Client');
-
+// ============================================================================
 // @route   GET /api/clients
 // @desc    Get all client logos (Public)
+// ============================================================================
 const getClients = async (req, res) => {
     try {
         const clients = await Client.find().sort({ createdAt: -1 });
@@ -10,9 +11,10 @@ const getClients = async (req, res) => {
         res.status(500).json({ success: false, message: 'Server Error' });
     }
 };
-
+// ============================================================================
 // @route   POST /api/clients
 // @desc    Add a new client logo (Admin Only)
+// ============================================================================
 const addClient = async (req, res) => {
     try {
         const { name, logoUrl } = req.body;

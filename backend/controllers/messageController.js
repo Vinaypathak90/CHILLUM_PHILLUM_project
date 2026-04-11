@@ -1,8 +1,9 @@
 const Message = require('../models/Message');
-
+// ============================================================================
 // @desc    Send a new message (Contact Form)
 // @route   POST /api/messages
 // @access  Public
+// ============================================================================
 const sendMessage = async (req, res) => {
   try {
     const { name, email, phone, subject, message } = req.body;
@@ -22,10 +23,11 @@ const sendMessage = async (req, res) => {
         });
     }
 };
-
+// ============================================================================
 // @desc    Get all messages
 // @route   GET /api/messages
 // @access  Private (Admin Only)
+// ============================================================================
 const getAllMessages = async (req, res) => {
     try {
         const messages = await Message.find().sort({ createdAt: -1 }); // Newest first
@@ -42,11 +44,12 @@ const getAllMessages = async (req, res) => {
         });
     }
 };
-
+// ============================================================================
 // 🔥 NAYA: Update Message Status (Unread -> Read)
 // @desc    Update message status
 // @route   PUT /api/messages/:id
 // @access  Private (Admin Only)
+// ============================================================================
 const updateMessageStatus = async (req, res) => {
     try {
         const { status } = req.body;
@@ -72,11 +75,12 @@ const updateMessageStatus = async (req, res) => {
         });
     }
 };
-
+// ============================================================================
 // 🔥 NAYA: Delete a message
 // @desc    Delete message
 // @route   DELETE /api/messages/:id
 // @access  Private (Admin Only)
+// ============================================================================
 const deleteMessage = async (req, res) => {
     try {
         const deletedMessage = await Message.findByIdAndDelete(req.params.id);
