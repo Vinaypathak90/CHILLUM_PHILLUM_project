@@ -21,7 +21,7 @@ api.interceptors.request.use(
         return requestConfig;
     }, 
     (error) => {
-        // Agar request banne mein koi error aaye toh reject kar do
+        
         return Promise.reject(error);
     }
 );
